@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "C++ Learning Platform"
+version = "1.0.0"
+id = "artifacts/cpp-learn"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22007
+
+[services.development]
+run = "pnpm --filter @workspace/cpp-learn run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/cpp-learn", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/cpp-learn/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22007"
+BASE_PATH = "/"

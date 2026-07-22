@@ -3,20 +3,33 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: C++ Learning Platform API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: lessons
+    description: C++ lesson content
+  - name: quiz
+    description: Lesson quizzes
+  - name: glossary
+    description: C++ glossary terms
+  - name: code
+    description: Code execution
+  - name: ai
+    description: AI tutor
+  - name: progress
+    description: Learning progress
+  - name: achievements
+    description: Achievements and badges
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +37,213 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /lessons:
+    get:
+      operationId: getLessons
+      tags: [lessons]
+      summary: List all lessons
+      responses:
+        "200":
+          description: List of lessons
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LessonSummary"
+
+  /lessons/{lessonId}:
+    get:
+      operationId: getLesson
+      tags: [lessons]
+      summary: Get full lesson content
+      parameters:
+        - name: lessonId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lesson content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lesson"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /lessons/{lessonId}/quiz:
+    get:
+      operationId: getLessonQuiz
+      tags: [quiz]
+      summary: Get quiz questions for a lesson
+      parameters:
+        - name: lessonId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Quiz questions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QuizQuestion"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /glossary:
+    get:
+      operationId: getGlossary
+      tags: [glossary]
+      summary: List all glossary terms
+      responses:
+        "200":
+          description: Glossary terms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GlossaryTerm"
+
+  /glossary/{term}:
+    get:
+      operationId: getGlossaryTerm
+      tags: [glossary]
+      summary: Get a specific glossary term detail
+      parameters:
+        - name: term
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Term detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GlossaryTermDetail"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /code/run:
+    post:
+      operationId: runCode
+      tags: [code]
+      summary: Execute C++ code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CodeRunInput"
+      responses:
+        "200":
+          description: Execution result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CodeRunResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /ai/chat:
+    post:
+      operationId: aiChat
+      tags: [ai]
+      summary: Send a message to the AI tutor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiChatInput"
+      responses:
+        "200":
+          description: AI response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiChatResult"
+        "500":
+          description: AI error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /progress:
+    get:
+      operationId: getProgress
+      tags: [progress]
+      summary: Get overall learning progress summary
+      responses:
+        "200":
+          description: Progress summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProgressSummary"
+
+  /achievements:
+    get:
+      operationId: getAchievements
+      tags: [achievements]
+      summary: Get all achievements
+      responses:
+        "200":
+          description: List of achievements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Achievement"
+
+  /flashcards:
+    get:
+      operationId: getFlashcards
+      tags: [lessons]
+      summary: Get flashcards (optionally filtered by lessonId)
+      parameters:
+        - name: lessonId
+          in: query
+          required: false
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: Flashcards
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Flashcard"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +251,289 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+
+    LessonSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        order:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        difficulty:
+          type: string
+          enum: [beginner, intermediate, advanced]
+        estimatedMinutes:
+          type: integer
+        topics:
+          type: array
+          items:
+            type: string
+      required: [id, order, title, description, difficulty, estimatedMinutes, topics]
+
+    Lesson:
+      type: object
+      properties:
+        id:
+          type: string
+        order:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        difficulty:
+          type: string
+          enum: [beginner, intermediate, advanced]
+        estimatedMinutes:
+          type: integer
+        topics:
+          type: array
+          items:
+            type: string
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/LessonSection"
+        codeExamples:
+          type: array
+          items:
+            $ref: "#/components/schemas/CodeExample"
+        keyPoints:
+          type: array
+          items:
+            type: string
+        nextLessonId:
+          type: ["string", "null"]
+        prevLessonId:
+          type: ["string", "null"]
+      required: [id, order, title, description, difficulty, estimatedMinutes, topics, content, codeExamples, keyPoints]
+
+    LessonSection:
+      type: object
+      properties:
+        heading:
+          type: ["string", "null"]
+        body:
+          type: string
+        type:
+          type: string
+          enum: [text, note, warning, tip, code]
+        code:
+          type: ["string", "null"]
+        language:
+          type: ["string", "null"]
+      required: [body, type]
+
+    CodeExample:
+      type: object
+      properties:
+        title:
+          type: string
+        code:
+          type: string
+        explanation:
+          type: string
+        runnable:
+          type: boolean
+      required: [title, code, explanation, runnable]
+
+    QuizQuestion:
+      type: object
+      properties:
+        id:
+          type: string
+        lessonId:
+          type: string
+        type:
+          type: string
+          enum: [multiple_choice, true_false, fill_blank, predict_output]
+        question:
+          type: string
+        options:
+          type: ["array", "null"]
+          items:
+            type: string
+        correctAnswer:
+          type: string
+        explanation:
+          type: string
+        codeSnippet:
+          type: ["string", "null"]
+      required: [id, lessonId, type, question, correctAnswer, explanation]
+
+    GlossaryTerm:
+      type: object
+      properties:
+        term:
+          type: string
+        slug:
+          type: string
+        shortDefinition:
+          type: string
+        category:
+          type: string
+      required: [term, slug, shortDefinition, category]
+
+    GlossaryTermDetail:
+      type: object
+      properties:
+        term:
+          type: string
+        slug:
+          type: string
+        shortDefinition:
+          type: string
+        category:
+          type: string
+        definition:
+          type: string
+        whyItExists:
+          type: string
+        syntax:
+          type: string
+        analogy:
+          type: string
+        codeExample:
+          type: string
+        commonMistakes:
+          type: array
+          items:
+            type: string
+        bestPractices:
+          type: array
+          items:
+            type: string
+        relatedTerms:
+          type: array
+          items:
+            type: string
+      required: [term, slug, shortDefinition, category, definition, whyItExists, syntax, analogy, codeExample, commonMistakes, bestPractices, relatedTerms]
+
+    CodeRunInput:
+      type: object
+      properties:
+        code:
+          type: string
+        stdin:
+          type: ["string", "null"]
+      required: [code]
+
+    CodeRunResult:
+      type: object
+      properties:
+        stdout:
+          type: string
+        stderr:
+          type: string
+        exitCode:
+          type: integer
+        compilationError:
+          type: ["string", "null"]
+        executionTime:
+          type: ["number", "null"]
+      required: [stdout, stderr, exitCode]
+
+    AiChatInput:
+      type: object
+      properties:
+        message:
+          type: string
+        lessonContext:
+          type: ["string", "null"]
+        conversationHistory:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatMessage"
+      required: [message]
+
+    ChatMessage:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+      required: [role, content]
+
+    AiChatResult:
+      type: object
+      properties:
+        reply:
+          type: string
+        suggestedFollowUps:
+          type: array
+          items:
+            type: string
+      required: [reply, suggestedFollowUps]
+
+    ProgressSummary:
+      type: object
+      properties:
+        totalLessons:
+          type: integer
+        completedLessons:
+          type: integer
+        totalQuizzes:
+          type: integer
+        passedQuizzes:
+          type: integer
+        averageScore:
+          type: number
+        streak:
+          type: integer
+        xp:
+          type: integer
+        level:
+          type: integer
+        completedLessonIds:
+          type: array
+          items:
+            type: string
+      required: [totalLessons, completedLessons, totalQuizzes, passedQuizzes, averageScore, streak, xp, level, completedLessonIds]
+
+    Achievement:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        category:
+          type: string
+        requirement:
+          type: string
+        xpReward:
+          type: integer
+      required: [id, title, description, icon, category, requirement, xpReward]
+
+    Flashcard:
+      type: object
+      properties:
+        id:
+          type: string
+        lessonId:
+          type: string
+        front:
+          type: string
+        back:
+          type: string
+        category:
+          type: string
+      required: [id, lessonId, front, back, category]

@@ -2,7 +2,7 @@
 
 [build]
   base = "artifacts/cpp-learn"
-  command = "PORT=3000 BASE_PATH=/ npx vite build"
+  command = "pnpm run build"
   publish = "dist/public"
 
 [build.environment]

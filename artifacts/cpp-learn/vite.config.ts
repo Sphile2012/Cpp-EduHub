@@ -7,18 +7,16 @@ import { VitePWA } from 'vite-plugin-pwa';
 const rawPort = process.env.PORT;
 
 if (!rawPort) {
-  throw new Error(
-    'PORT environment variable is required but was not provided.',
-  );
+  console.warn('PORT environment variable not set, using default: 3000');
 }
 
-const port = Number(rawPort);
+const port = rawPort ? Number(rawPort) : 3000;
 
 if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-const basePath = process.env.BASE_PATH;
+const basePath = process.env.BASE_PATH || '/';
 
 if (!basePath) {
   throw new Error(

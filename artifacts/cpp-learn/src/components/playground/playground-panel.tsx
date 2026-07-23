@@ -37,7 +37,7 @@ export function PlaygroundPanel({ initialCode = "" }: PlaygroundPanelProps) {
 
   const handleRun = async () => {
     setIsRunning(true);
-    setOutput({ stdout: "⏳ Compiling and running...", stderr: "", exitCode: 0, executionTime: 0 });
+    setOutput(null); // Clear previous output
     
     try {
       // Built-in C++ compilation simulation
@@ -309,34 +309,70 @@ export function PlaygroundPanel({ initialCode = "" }: PlaygroundPanelProps) {
       </div>
 
       {/* Output Area */}
-      <div className="h-1/3 min-h-[150px] border-t border-[#333] bg-[#0c0c0c] flex flex-col">
-        <div className="px-4 py-1.5 bg-[#1a1a1a] border-b border-[#2a2a2a] text-xs font-mono tracking-wider text-zinc-500 flex justify-between">
-          <span>TERMINAL</span>
-          {output?.executionTime && <span>{output.executionTime}ms</span>}
+      <div className="h-1/3 min-h-[250px] border-t-2 border-amber-600/30 bg-[#0c0c0c] flex flex-col shadow-2xl">
+        <div className="px-4 py-2 bg-[#1a1a1a] border-b border-[#2a2a2a] text-xs font-mono tracking-wider text-zinc-400 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${isRunning ? 'bg-amber-500 animate-pulse' : output ? 'bg-green-500' : 'bg-zinc-700'}`}></div>
+            <span className="font-semibold">OUTPUT TERMINAL</span>
+          </div>
+          {output?.executionTime !== undefined && (
+            <span className="text-cyan-400">⏱️ {output.executionTime}ms</span>
+          )}
         </div>
-        <div className="flex-1 p-4 overflow-auto font-mono text-sm whitespace-pre-wrap">
+        <div className="flex-1 p-4 overflow-auto font-mono text-sm">
           {isRunning ? (
-            <div className="text-amber-400 flex items-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin" /> Compiling and executing your code...
+            <div className="text-amber-400 flex items-center gap-2 animate-pulse">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Compiling and executing your code...</span>
             </div>
           ) : !output ? (
-            <div className="text-zinc-600 italic">Click RUN to execute your code...</div>
+            <div className="text-zinc-500 italic flex flex-col gap-2">
+              <div>💡 Click <span className="text-amber-500 font-bold">RUN</span> button to execute your code</div>
+              <div className="text-xs text-zinc-600">Or press <kbd className="px-2 py-1 bg-zinc-800 rounded border border-zinc-700">Cmd+Enter</kbd> (Mac) / <kbd className="px-2 py-1 bg-zinc-800 rounded border border-zinc-700">Ctrl+Enter</kbd> (Windows)</div>
+            </div>
           ) : (
-            <>
+            <div className="space-y-3">
+              {/* Compilation Error */}
               {output.compilationError && (
-                <div className="text-red-400 mb-2 flex items-start gap-2 bg-red-950/30 p-2 rounded">
-                  <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span>{output.compilationError}</span>
+                <div className="text-red-400 flex items-start gap-2 bg-red-950/30 border border-red-900/50 p-3 rounded">
+                  <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="font-bold mb-1">❌ Compilation Error:</div>
+                    <div className="whitespace-pre-wrap">{output.compilationError}</div>
+                  </div>
                 </div>
               )}
-              {output.stdout && <div className="text-green-400">{output.stdout}</div>}
-              {output.stderr && <div className="text-red-400">{output.stderr}</div>}
-              {output.exitCode !== undefined && output.exitCode !== 0 && (
-                <div className="mt-4 text-xs text-amber-500">
-                  Process finished with exit code {output.exitCode}
+              
+              {/* Standard Output */}
+              {output.stdout && (
+                <div className="bg-zinc-900/50 border border-zinc-800 rounded p-3">
+                  <div className="text-cyan-400 text-xs font-bold mb-2 flex items-center gap-2">
+                    <Terminal className="w-3 h-3" />
+                    STDOUT
+                  </div>
+                  <div className="text-green-400 whitespace-pre-wrap leading-relaxed">{output.stdout}</div>
                 </div>
               )}
-            </>
+              
+              {/* Standard Error */}
+              {output.stderr && (
+                <div className="bg-red-950/20 border border-red-900/50 rounded p-3">
+                  <div className="text-red-400 text-xs font-bold mb-2 flex items-center gap-2">
+                    <AlertCircle className="w-3 h-3" />
+                    STDERR
+                  </div>
+                  <div className="text-red-300 whitespace-pre-wrap">{output.stderr}</div>
+                </div>
+              )}
+              
+              {/* Exit Code */}
+              <div className={`flex items-center gap-2 text-xs font-medium p-2 rounded ${output.exitCode === 0 ? 'text-green-400 bg-green-950/30' : 'text-red-400 bg-red-950/30'}`}>
+                {output.exitCode === 0 ? '✅' : '❌'}
+                Process finished with exit code <span className="font-bold">{output.exitCode}</span>
+                {output.exitCode === 0 && <span className="ml-auto text-zinc-500">(Success)</span>}
+                {output.exitCode !== 0 && <span className="ml-auto text-zinc-500">(Error)</span>}
+              </div>
+            </div>
           )}
         </div>
       </div>

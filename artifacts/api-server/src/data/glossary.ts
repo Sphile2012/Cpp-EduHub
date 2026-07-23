@@ -809,7 +809,7 @@ int main() {
     commonMistakes: [
       "Forgetting include guards (causes multiple definition errors)",
       "Putting function implementations in headers (increases compile time)",
-      "Using <> instead of "" for local headers",
+      "Using angle brackets instead of quotes for local headers",
     ],
     bestPractices: [
       "Use #pragma once or include guards in every header",

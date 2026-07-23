@@ -1,7 +1,8 @@
 import { useGetLessons, useGetProgress } from "@/hooks/use-static-data";
 import { useLocalProgress } from "@/hooks/use-local-progress";
+import { useLanguage } from "@/hooks/use-language";
 import { Link } from "wouter";
-import { BookOpen, Target, CheckCircle2, Flame, Trophy, Activity, ArrowRight, Play, Award, Layers, TerminalSquare, Sparkles } from "lucide-react";
+import { BookOpen, Target, CheckCircle2, Flame, Trophy, Activity, ArrowRight, Play, Award, Layers, TerminalSquare, Sparkles, Code, Brain, Zap, Calendar, Star } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -13,14 +14,66 @@ export default function Dashboard() {
   const { data: lessons, isLoading: isLoadingLessons } = useGetLessons();
   const { data: apiProgress, isLoading: isLoadingProgress } = useGetProgress();
   const { getMergedProgress, completedLessonIds } = useLocalProgress();
+  const { languageConfig } = useLanguage();
 
-  const progress = getMergedProgress(apiProgress);
+  const progress = getMergedProgress(apiProgress ?? undefined);
 
   const nextLesson = lessons?.find(l => !completedLessonIds.includes(l.id)) || lessons?.[0];
 
+  const quickActions = [
+    {
+      title: "Code Playground",
+      description: `Write and test ${languageConfig?.name || "code"} instantly.`,
+      icon: TerminalSquare,
+      href: "/playground",
+      color: "text-blue-500",
+      bgColor: "bg-blue-500/10",
+    },
+    {
+      title: "Learning Hub",
+      description: "Explore concepts, challenges, errors, and progress in one place.",
+      icon: Sparkles,
+      href: "/learning-hub",
+      color: "text-purple-500",
+      bgColor: "bg-purple-500/10",
+    },
+    {
+      title: "AI Tutor",
+      description: "Get instant help with any programming question.",
+      icon: Brain,
+      href: "/ai-tutor",
+      color: "text-green-500",
+      bgColor: "bg-green-500/10",
+    },
+    {
+      title: "Daily Challenge",
+      description: "Test your skills with today's coding challenge.",
+      icon: Zap,
+      href: "/quiz/daily",
+      color: "text-orange-500",
+      bgColor: "bg-orange-500/10",
+    },
+    {
+      title: "Glossary",
+      description: "Look up concepts, syntax, and definitions.",
+      icon: BookOpen,
+      href: "/glossary",
+      color: "text-cyan-500",
+      bgColor: "bg-cyan-500/10",
+    },
+    {
+      title: "Achievements",
+      description: "View your badges and milestones.",
+      icon: Trophy,
+      href: "/achievements",
+      color: "text-yellow-500",
+      bgColor: "bg-yellow-500/10",
+    },
+  ];
+
   return (
     <div className="space-y-8">
-      {/* Video Hero Section */}
+      {/* Video Hero Section with uPhumeh Branding */}
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -56,8 +109,18 @@ export default function Dashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
+              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-4">
+                <Code className="w-4 h-4 text-blue-400" />
+                <span className="text-sm text-white/80 font-medium">
+                  Learning {languageConfig?.name || "Programming"}
+                </span>
+              </div>
+              
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-4 drop-shadow-2xl font-handwriting">
-                Master C++ with <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">uPhumeh</span>
+                Master Programming with{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+                  uPhumeh
+                </span>
               </h1>
             </motion.div>
             
@@ -67,7 +130,7 @@ export default function Dashboard() {
               transition={{ delay: 0.4 }}
               className="text-xl md:text-2xl text-gray-200 max-w-2xl mx-auto drop-shadow-lg"
             >
-              Your journey to becoming a C++ expert starts here. Learn, practice, and master programming for free.
+              Learn, Practice, Build, and Become a Professional Developer
             </motion.p>
 
             <motion.div 
@@ -176,7 +239,7 @@ export default function Dashboard() {
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold font-handwriting flex items-center gap-2">
-              <Target className="w-6 h-6 text-primary" /> Roadmap
+              <Target className="w-6 h-6 text-primary" /> Learning Path
             </h2>
             <Link href="/lessons" className="text-sm text-primary hover:underline font-medium inline-flex items-center gap-1">
               View All <ArrowRight className="w-4 h-4" />
@@ -235,50 +298,53 @@ export default function Dashboard() {
           </h2>
           
           <div className="grid gap-4">
-            <Link href="/playground">
-              <Card className="hover:border-primary transition-all hover:-translate-y-1 hover:shadow-md cursor-pointer group">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <div className="p-2 bg-primary/10 rounded-md text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                      <TerminalSquare className="w-5 h-5" />
-                    </div>
-                    Code Playground
-                  </CardTitle>
-                  <CardDescription>Write and test C++ code instantly.</CardDescription>
-                </CardHeader>
-              </Card>
-            </Link>
-            
-            <Link href="/learning-hub">
-              <Card className="hover:border-primary transition-all hover:-translate-y-1 hover:shadow-md cursor-pointer group">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <div className="p-2 bg-primary/10 rounded-md text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                      <Sparkles className="w-5 h-5" />
-                    </div>
-                    Learning Hub
-                  </CardTitle>
-                  <CardDescription>Explore concepts, challenges, errors, and progress in one place.</CardDescription>
-                </CardHeader>
-              </Card>
-            </Link>
-
-            <Link href="/glossary">
-              <Card className="hover:border-primary transition-all hover:-translate-y-1 hover:shadow-md cursor-pointer group">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <div className="p-2 bg-primary/10 rounded-md text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                      <BookOpen className="w-5 h-5" />
-                    </div>
-                    Glossary
-                  </CardTitle>
-                  <CardDescription>Look up concepts, syntax, and definitions.</CardDescription>
-                </CardHeader>
-              </Card>
-            </Link>
+            {quickActions.slice(0, 4).map((action) => (
+              <Link key={action.title} href={action.href}>
+                <Card className="hover:border-primary transition-all hover:-translate-y-1 hover:shadow-md cursor-pointer group">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <div className={cn("p-2 rounded-md", action.bgColor, action.color)}>
+                        <action.icon className="w-5 h-5" />
+                      </div>
+                      {action.title}
+                    </CardTitle>
+                    <CardDescription>{action.description}</CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
+            ))}
           </div>
         </div>
       </div>
+
+      {/* Daily Challenge Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+      >
+        <Card className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 border-purple-500/30 overflow-hidden">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-yellow-500/20 rounded-full">
+                  <Star className="w-8 h-8 text-yellow-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">Daily Coding Challenge</h3>
+                  <p className="text-gray-300">Complete today's challenge to earn bonus XP and keep your streak alive!</p>
+                </div>
+              </div>
+              <Link href="/quiz/daily">
+                <button className="inline-flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-3 rounded-lg font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-105">
+                  <Zap className="w-4 h-4" />
+                  Start Challenge
+                </button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
       </div>
     </div>
   );

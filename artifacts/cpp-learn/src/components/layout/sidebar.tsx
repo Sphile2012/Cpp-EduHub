@@ -22,7 +22,7 @@ export function Sidebar({ className }: { className?: string }) {
   const navItems = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
     { href: "/lessons", label: "Lessons", icon: BookOpen },
-    { href: "/quiz/basics", label: "Quiz", icon: FileQuestion },
+    { href: "/quiz/what-is-cpp", label: "Quiz", icon: FileQuestion },
     { href: "/playground", label: "Playground", icon: TerminalSquare },
     { href: "/learning-hub", label: "Learning Hub", icon: Sparkles },
     { href: "/ai-tutor", label: "AI Tutor", icon: Bot },

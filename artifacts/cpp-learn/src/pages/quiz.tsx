@@ -1,20 +1,22 @@
 import { useParams, useLocation } from "wouter";
-import { useGetLessonQuiz } from "@/hooks/use-static-data";
-import { useState, useEffect } from "react";
+import { useGetLessonQuiz, useGetLessons } from "@/hooks/use-static-data";
+import { useState } from "react";
 import { useLocalProgress } from "@/hooks/use-local-progress";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SimpleSyntaxHighlighter } from "@/components/ui/syntax-highlighter";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, XCircle, Trophy, ArrowRight, RotateCcw } from "lucide-react";
+import { CheckCircle2, XCircle, Trophy, ArrowRight, RotateCcw, BookOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
+import { Link } from "wouter";
 
 export default function QuizPage() {
   const { lessonId: lessonIdParam } = useParams<{ lessonId: string }>();
   const [_, setLocation] = useLocation();
   const lessonId = lessonIdParam || "";
   const { data: questions } = useGetLessonQuiz(lessonId);
+  const { data: allLessons } = useGetLessons();
   const { saveQuizScore } = useLocalProgress();
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -24,11 +26,50 @@ export default function QuizPage() {
   const [score, setScore] = useState(0);
 
   if (!questions || questions.length === 0) {
+    // Find lessons that have quizzes
+    const lessonsWithQuizzes = [
+      { id: "what-is-cpp", title: "What Is C++?" },
+      { id: "how-cpp-works", title: "How C++ Works" },
+      { id: "data-types", title: "Data Types" },
+      { id: "operators", title: "Operators" },
+      { id: "loops", title: "Loops" },
+      { id: "functions", title: "Functions" },
+      { id: "input-output", title: "Input & Output" },
+      { id: "pointers-memory", title: "Pointers & Memory" },
+      { id: "oop", title: "Object-Oriented Programming" },
+      { id: "dependencies-building", title: "Dependencies & Building" },
+    ];
+
     return (
-      <div className="p-8 text-center">
-        <h2 className="text-2xl font-bold mb-4">No Quiz Available</h2>
-        <p className="text-muted-foreground mb-6">There is no quiz for this lesson yet.</p>
-        <Button onClick={() => setLocation('/lessons')}>Back to Lessons</Button>
+      <div className="min-h-screen p-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold mb-4">No Quiz Available</h2>
+            <p className="text-muted-foreground mb-6">
+              There is no quiz for this lesson yet. Choose from available quizzes below:
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            {lessonsWithQuizzes.map((lesson) => (
+              <Link key={lesson.id} href={`/quiz/${lesson.id}`}>
+                <Card className="p-6 hover:border-primary transition-colors cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <BookOpen className="w-5 h-5 text-primary" />
+                    <div>
+                      <h3 className="font-semibold">{lesson.title}</h3>
+                      <p className="text-sm text-muted-foreground">Click to start quiz</p>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <Button onClick={() => setLocation('/lessons')}>Back to Lessons</Button>
+          </div>
+        </div>
       </div>
     );
   }

@@ -13,22 +13,20 @@ import {
   Sparkles,
   FileQuestion,
   User,
-  LogOut,
-  Moon,
-  Sun
+  LogIn,
+  UserPlus,
+  LogOut
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
-import { useLanguage } from "@/hooks/use-language";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 
 export function MobileHeader() {
   const [isOpen, setIsOpen] = useState(false);
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
-  const { languageConfig } = useLanguage();
 
   const navItems = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -42,29 +40,49 @@ export function MobileHeader() {
     { href: "/achievements", label: "Achievements", icon: Trophy },
   ];
 
+  const handleLogout = () => {
+    logout();
+    setIsOpen(false);
+    setLocation('/');
+  };
+
   return (
     <>
-      {/* Header with Hamburger Menu (All Screen Sizes) */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      {/* Mobile Header */}
+      <header className="md:hidden sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex items-center justify-between px-4 h-14">
           <Link href="/" className="flex items-center gap-2 font-handwriting text-xl font-bold text-primary">
             <TerminalSquare className="w-6 h-6" />
-            <span>uPhumeh</span>
+            <span>cpp_learn</span>
           </Link>
           
           <div className="flex items-center gap-2">
-            {/* Language Badge */}
-            {languageConfig && (
-              <Badge variant="outline" className="hidden sm:inline-flex">
-                {languageConfig.icon} {languageConfig.name}
-              </Badge>
+            {/* User Avatar/Auth Buttons */}
+            {isAuthenticated && user ? (
+              <Link href="/profile">
+                <Avatar className="w-8 h-8 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
+                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">
+                    {user.name?.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
+            ) : (
+              <Link href="/login">
+                <Button variant="ghost" size="sm" className="text-xs px-2">
+                  <LogIn className="w-4 h-4 mr-1" />
+                  Login
+                </Button>
+              </Link>
             )}
-            
+
+            {/* Hamburger Menu Button */}
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setIsOpen(!isOpen)}
               aria-label="Toggle menu"
+              className="ml-1"
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </Button>
@@ -72,58 +90,74 @@ export function MobileHeader() {
         </div>
       </header>
 
-      {/* Menu Overlay */}
+      {/* Mobile Menu Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm" 
+          className="md:hidden fixed inset-0 z-40 bg-background/80 backdrop-blur-sm" 
           onClick={() => setIsOpen(false)} 
         />
       )}
 
-      {/* Menu Drawer */}
+      {/* Mobile Menu Drawer */}
       <nav
         className={cn(
-          "fixed top-14 right-0 z-50 h-[calc(100vh-3.5rem)] w-72 bg-card border-l shadow-lg transition-transform duration-300 ease-in-out overflow-y-auto",
+          "md:hidden fixed top-14 right-0 z-50 h-[calc(100vh-3.5rem)] w-72 bg-card border-l shadow-lg transition-transform duration-300 ease-in-out overflow-y-auto",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
         <div className="flex flex-col p-4 space-y-1">
-          {/* User Section */}
+          {/* User Info Section */}
           {isAuthenticated && user ? (
-            <div className="mb-4 p-3 rounded-lg bg-accent/10 border">
-              <div className="flex items-center gap-3">
-                <Avatar className="w-10 h-10">
-                  <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-                    {user.name.charAt(0).toUpperCase()}
+            <div className="mb-4 p-4 bg-primary/5 rounded-lg border border-primary/10">
+              <div className="flex items-center gap-3 mb-3">
+                <Avatar className="w-12 h-12">
+                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarFallback className="bg-primary/20 text-primary font-bold">
+                    {user.name?.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm truncate">{user.name}</p>
+                  <p className="font-semibold text-sm truncate">{user.name}</p>
                   <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                 </div>
               </div>
-              <div className="mt-3 flex items-center gap-2">
-                <Badge variant="secondary" className="text-xs">
-                  Level {user.stats.level}
-                </Badge>
-                <Badge variant="outline" className="text-xs">
-                  {user.stats.totalXp} XP
-                </Badge>
+              <div className="flex gap-2">
+                <Link href="/profile" onClick={() => setIsOpen(false)} className="flex-1">
+                  <Button variant="outline" size="sm" className="w-full gap-2">
+                    <User className="w-4 h-4" />
+                    Profile
+                  </Button>
+                </Link>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleLogout}
+                  className="flex-1 gap-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </Button>
               </div>
             </div>
           ) : (
-            <div className="mb-4 p-3 rounded-lg bg-accent/10 border">
-              <p className="text-sm text-muted-foreground mb-2">Sign in to track progress</p>
-              <div className="flex gap-2">
-                <Link href="/login" onClick={() => setIsOpen(false)}>
-                  <Button variant="outline" size="sm" className="w-full">Login</Button>
-                </Link>
-                <Link href="/signup" onClick={() => setIsOpen(false)}>
-                  <Button size="sm" className="w-full">Sign Up</Button>
-                </Link>
-              </div>
+            <div className="mb-4 p-4 bg-primary/5 rounded-lg border border-primary/10 space-y-2">
+              <p className="text-sm text-muted-foreground mb-3">Sign in to save your progress</p>
+              <Link href="/login" onClick={() => setIsOpen(false)}>
+                <Button variant="default" size="sm" className="w-full gap-2">
+                  <LogIn className="w-4 h-4" />
+                  Login
+                </Button>
+              </Link>
+              <Link href="/signup" onClick={() => setIsOpen(false)}>
+                <Button variant="outline" size="sm" className="w-full gap-2">
+                  <UserPlus className="w-4 h-4" />
+                  Sign Up
+                </Button>
+              </Link>
             </div>
           )}
+
+          <Separator className="my-2" />
 
           {/* Navigation Items */}
           {navItems.map((item) => {
@@ -148,31 +182,6 @@ export function MobileHeader() {
               </Link>
             );
           })}
-
-          {/* Divider */}
-          <div className="my-2 border-t" />
-
-          {/* User Actions */}
-          {isAuthenticated ? (
-            <>
-              <Link href="/profile" onClick={() => setIsOpen(false)}>
-                <div className="flex items-center gap-3 px-3 py-3 rounded-md text-sm font-medium hover:bg-accent/10 text-muted-foreground hover:text-foreground transition-colors">
-                  <User className="w-5 h-5" />
-                  Profile
-                </div>
-              </Link>
-              <button
-                onClick={() => {
-                  logout();
-                  setIsOpen(false);
-                }}
-                className="flex items-center gap-3 px-3 py-3 rounded-md text-sm font-medium hover:bg-destructive/10 text-destructive transition-colors w-full text-left"
-              >
-                <LogOut className="w-5 h-5" />
-                Logout
-              </button>
-            </>
-          ) : null}
         </div>
       </nav>
     </>

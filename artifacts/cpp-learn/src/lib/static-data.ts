@@ -5604,6 +5604,26 @@ cout << "Hello, " << name << "! You are " << age << " years old." << endl;`,
       lessonId: "data-types",
       type: "predict_output",
       question: "What will this code output?",
+      codeSnippet: `bool isTrue = true;
+std::cout << isTrue;`,
+      options: ["true", "1", "TRUE", "false"],
+      correctAnswer: "1",
+      explanation: "In C++, bool values print as 1 (true) or 0 (false) by default. To print 'true'/'false', use std::cout << std::boolalpha << isTrue.",
+    },
+    {
+      id: "dt-4",
+      lessonId: "data-types",
+      type: "multiple_choice",
+      question: "What is the correct way to declare a constant integer?",
+      options: ["int const x = 10;", "const int x = 10;", "final int x = 10;", "readonly int x = 10;"],
+      correctAnswer: "const int x = 10;",
+      explanation: "Use 'const' before the type to make a variable read-only. 'const int x = 10;' is the standard syntax in C++.",
+    },
+    {
+      id: "dt-5",
+      lessonId: "data-types",
+      type: "predict_output",
+      question: "What is the output?",
       codeSnippet: `int x = 5;
 int y = 2;
 cout << x / y;`,

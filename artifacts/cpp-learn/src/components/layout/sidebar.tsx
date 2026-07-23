@@ -8,15 +8,23 @@ import {
   LayoutDashboard,
   Bot,
   Sparkles,
-  FileQuestion
+  FileQuestion,
+  User,
+  LogIn,
+  LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocalProgress } from "@/hooks/use-local-progress";
+import { useAuth } from "@/hooks/use-auth";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 
 export function Sidebar({ className }: { className?: string }) {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { getMergedProgress } = useLocalProgress();
+  const { user, isAuthenticated, logout } = useAuth();
   const progress = getMergedProgress();
 
   const navItems = [
@@ -31,6 +39,11 @@ export function Sidebar({ className }: { className?: string }) {
     { href: "/achievements", label: "Achievements", icon: Trophy },
   ];
 
+  const handleLogout = () => {
+    logout();
+    setLocation('/');
+  };
+
   return (
     <div className={cn("flex flex-col border-r bg-card/50 text-card-foreground w-64 min-h-screen", className)}>
       <div className="p-6">
@@ -38,8 +51,65 @@ export function Sidebar({ className }: { className?: string }) {
           <TerminalSquare className="w-8 h-8" />
           <span>cpp_learn</span>
         </Link>
-        <p className="text-muted-foreground text-xs mt-1 font-mono">v0.1.0_beta</p>
+        <p className="text-muted-foreground text-xs mt-1 font-mono">v0.2.0_beta</p>
       </div>
+
+      {/* User Section */}
+      {isAuthenticated && user ? (
+        <div className="px-4 mb-4">
+          <div className="bg-background rounded-lg p-3 border shadow-sm">
+            <div className="flex items-center gap-3 mb-3">
+              <Avatar className="w-10 h-10">
+                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarFallback className="bg-primary/20 text-primary font-semibold">
+                  {user.name?.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm truncate">{user.name}</p>
+                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Link href="/profile" className="flex-1">
+                <Button variant="outline" size="sm" className="w-full text-xs gap-1">
+                  <User className="w-3 h-3" />
+                  Profile
+                </Button>
+              </Link>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleLogout}
+                className="flex-1 text-xs gap-1"
+              >
+                <LogOut className="w-3 h-3" />
+                Logout
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="px-4 mb-4">
+          <div className="bg-background rounded-lg p-3 border shadow-sm">
+            <p className="text-xs text-muted-foreground mb-3">Sign in to save progress</p>
+            <Link href="/login">
+              <Button variant="default" size="sm" className="w-full text-xs gap-2 mb-2">
+                <LogIn className="w-4 h-4" />
+                Login
+              </Button>
+            </Link>
+            <Link href="/signup">
+              <Button variant="outline" size="sm" className="w-full text-xs gap-2">
+                <User className="w-4 h-4" />
+                Sign Up
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
+
+      <Separator className="mx-4 mb-4" />
 
       <nav className="flex-1 px-4 space-y-1">
         {navItems.map((item) => {

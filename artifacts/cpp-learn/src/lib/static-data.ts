@@ -5580,6 +5580,237 @@ cout << "Hello, " << name << "! You are " << age << " years old." << endl;`,
     },
   ],
 
+  "data-types": [
+    {
+      id: "dt-1",
+      lessonId: "data-types",
+      type: "multiple_choice",
+      question: "Which data type would you use to store the value 3.14159?",
+      options: ["int", "double", "char", "bool"],
+      correctAnswer: "double",
+      explanation: "double is used for decimal numbers (floating-point). int stores whole numbers only, char stores single characters, and bool stores true/false.",
+    },
+    {
+      id: "dt-2",
+      lessonId: "data-types",
+      type: "true_false",
+      question: "A char variable in C++ can store a full word or sentence.",
+      options: ["True", "False"],
+      correctAnswer: "False",
+      explanation: "char stores only a SINGLE character. For words/sentences, use string (from the standard library).",
+    },
+    {
+      id: "dt-3",
+      lessonId: "data-types",
+      type: "predict_output",
+      question: "What will this code output?",
+      codeSnippet: `int x = 5;
+int y = 2;
+cout << x / y;`,
+      options: ["2.5", "2", "3", "Error"],
+      correctAnswer: "2",
+      explanation: "Integer division discards the remainder. 5 / 2 = 2 (not 2.5). For decimal results, use double: double x = 5.0; double y = 2.0;",
+    },
+  ],
+
+  "operators": [
+    {
+      id: "op-1",
+      lessonId: "operators",
+      type: "multiple_choice",
+      question: "What does the modulo operator % do?",
+      options: [
+        "Divides two numbers",
+        "Returns the remainder after division",
+        "Calculates percentage",
+        "Multiplies two numbers",
+      ],
+      correctAnswer: "Returns the remainder after division",
+      explanation: "The % operator returns the remainder. Example: 7 % 3 = 1 (because 7 ÷ 3 = 2 remainder 1).",
+    },
+    {
+      id: "op-2",
+      lessonId: "operators",
+      type: "predict_output",
+      question: "What will x be after this code runs?",
+      codeSnippet: `int x = 10;
+x += 5;`,
+      options: ["10", "5", "15", "Error"],
+      correctAnswer: "15",
+      explanation: "x += 5 is shorthand for x = x + 5. So x becomes 10 + 5 = 15.",
+    },
+    {
+      id: "op-3",
+      lessonId: "operators",
+      type: "multiple_choice",
+      question: "What is the difference between == and =?",
+      options: [
+        "They are the same",
+        "== compares equality, = assigns a value",
+        "= compares equality, == assigns a value",
+        "Both assign values",
+      ],
+      correctAnswer: "== compares equality, = assigns a value",
+      explanation: "= is assignment (x = 5 sets x to 5). == is comparison (x == 5 checks if x equals 5, returns true/false).",
+    },
+  ],
+
+  "loops": [
+    {
+      id: "loop-1",
+      lessonId: "loops",
+      type: "predict_output",
+      question: "How many times will this loop print 'Hello'?",
+      codeSnippet: `for (int i = 0; i < 5; i++) {
+    cout << "Hello" << endl;
+}`,
+      options: ["4", "5", "6", "Infinite"],
+      correctAnswer: "5",
+      explanation: "The loop runs while i < 5. Starting at 0: 0, 1, 2, 3, 4 → 5 times total.",
+    },
+    {
+      id: "loop-2",
+      lessonId: "loops",
+      type: "multiple_choice",
+      question: "What does the 'break' statement do in a loop?",
+      options: [
+        "Skips the current iteration and continues with the next",
+        "Exits the loop immediately",
+        "Pauses the loop temporarily",
+        "Restarts the loop from the beginning",
+      ],
+      correctAnswer: "Exits the loop immediately",
+      explanation: "break exits the loop completely. continue skips the current iteration and moves to the next one.",
+    },
+    {
+      id: "loop-3",
+      lessonId: "loops",
+      type: "true_false",
+      question: "A while loop checks its condition before running the loop body.",
+      options: ["True", "False"],
+      correctAnswer: "True",
+      explanation: "while checks the condition first. If false initially, the loop never runs. do-while checks after, so it always runs at least once.",
+    },
+  ],
+
+  "functions": [
+    {
+      id: "func-1",
+      lessonId: "functions",
+      type: "multiple_choice",
+      question: "What does a function's return type specify?",
+      options: [
+        "The number of parameters it takes",
+        "The type of value it returns",
+        "How long it takes to execute",
+        "Whether it can be called",
+      ],
+      correctAnswer: "The type of value it returns",
+      explanation: "The return type (int, double, void, etc.) tells you what type of value the function returns. void means it returns nothing.",
+    },
+    {
+      id: "func-2",
+      lessonId: "functions",
+      type: "predict_output",
+      question: "What will this code output?",
+      codeSnippet: `int multiply(int a, int b) {
+    return a * b;
+}
+
+int main() {
+    cout << multiply(3, 4);
+    return 0;
+}`,
+      options: ["7", "12", "34", "Error"],
+      correctAnswer: "12",
+      explanation: "The function multiply(3, 4) returns 3 * 4 = 12, which is then printed.",
+    },
+    {
+      id: "func-3",
+      lessonId: "functions",
+      type: "true_false",
+      question: "A function must always return a value.",
+      options: ["True", "False"],
+      correctAnswer: "False",
+      explanation: "Functions with return type void do not return a value. They just perform actions.",
+    },
+  ],
+
+  "input-output": [
+    {
+      id: "io-1",
+      lessonId: "input-output",
+      type: "multiple_choice",
+      question: "Which operator is used to read input from the user?",
+      options: ["cout <<", "cin >>", "scanf", "input()"],
+      correctAnswer: "cin >>",
+      explanation: "cin >> reads input from the user. cout << outputs to the console.",
+    },
+    {
+      id: "io-2",
+      lessonId: "input-output",
+      type: "true_false",
+      question: "cin >> stops reading input when it encounters a space.",
+      options: ["True", "False"],
+      correctAnswer: "True",
+      explanation: "cin >> reads until whitespace (space, tab, newline). To read a full line with spaces, use getline().",
+    },
+    {
+      id: "io-3",
+      lessonId: "input-output",
+      type: "multiple_choice",
+      question: "What does endl do?",
+      options: [
+        "Ends the program",
+        "Inserts a newline and flushes the output buffer",
+        "Pauses for user input",
+        "Clears the screen",
+      ],
+      correctAnswer: "Inserts a newline and flushes the output buffer",
+      explanation: "endl adds a newline (\\n) and flushes the buffer, ensuring output appears immediately. You can also use '\\n' for just a newline without flushing.",
+    },
+  ],
+
+  "pointers-memory": [
+    {
+      id: "pm-1",
+      lessonId: "pointers-memory",
+      type: "multiple_choice",
+      question: "What does the & operator do?",
+      options: [
+        "Dereferences a pointer",
+        "Gets the address of a variable",
+        "Allocates memory on the heap",
+        "Compares two values",
+      ],
+      correctAnswer: "Gets the address of a variable",
+      explanation: "& is the address-of operator. int* ptr = &x; stores the memory address of x in ptr.",
+    },
+    {
+      id: "pm-2",
+      lessonId: "pointers-memory",
+      type: "multiple_choice",
+      question: "What does the * operator do with pointers?",
+      options: [
+        "Multiplies two numbers",
+        "Dereferences a pointer to access the value it points to",
+        "Gets the address of a variable",
+        "Deletes a pointer",
+      ],
+      correctAnswer: "Dereferences a pointer to access the value it points to",
+      explanation: "* dereferences a pointer. int* ptr = &x; *ptr accesses the value stored at the address ptr points to.",
+    },
+    {
+      id: "pm-3",
+      lessonId: "pointers-memory",
+      type: "true_false",
+      question: "Memory allocated with 'new' must be manually freed with 'delete'.",
+      options: ["True", "False"],
+      correctAnswer: "True",
+      explanation: "Unlike stack memory which is automatically freed, heap memory allocated with 'new' must be manually freed with 'delete' to avoid memory leaks.",
+    },
+  ],
+
   "dependencies-building": [
     {
       id: "dep-1",

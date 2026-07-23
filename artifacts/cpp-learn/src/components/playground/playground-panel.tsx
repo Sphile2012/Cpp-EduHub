@@ -83,7 +83,7 @@ export function PlaygroundPanel({ initialCode = "" }: PlaygroundPanelProps) {
       }
 
       // Check for main function
-      if (!code.includes('int main')) {
+      if (!code.includes('int main') && !code.includes('void main')) {
         return {
           stdout: '',
           stderr: 'Compilation error: Missing main() function',
@@ -93,43 +93,67 @@ export function PlaygroundPanel({ initialCode = "" }: PlaygroundPanelProps) {
         };
       }
 
-      // Extract cout statements
-      const coutRegex = /cout\s*<<\s*([^;]+);/g;
+      // More flexible regex to match cout statements
+      // Matches: cout << "text"; cout << variable; cout << "a" << "b";
+      const coutPattern = /(?:std::)?cout\s*<<\s*([^;]+);/g;
       let match;
       
-      while ((match = coutRegex.exec(code)) !== null) {
-        let output = match[1];
+      while ((match = coutPattern.exec(code)) !== null) {
+        let expression = match[1];
         
-        // Handle string literals
-        output = output.replace(/"([^"]+)"/g, '$1');
+        // Split by << operator
+        const parts = expression.split(/\s*<<\s*/);
         
-        // Handle endl
-        output = output.replace(/\s*<<\s*endl/g, '\n');
-        
-        // Handle common escape sequences
-        output = output.replace(/\\n/g, '\n');
-        output = output.replace(/\\t/g, '\t');
-        
-        // Clean up extra << operators
-        output = output.replace(/\s*<<\s*/g, '');
-        
-        stdout += output;
+        for (let part of parts) {
+          // Handle string literals
+          if (part.includes('"')) {
+            const stringMatch = part.match(/"([^"]*)"/);
+            if (stringMatch) {
+              let str = stringMatch[1];
+              // Handle escape sequences
+              str = str.replace(/\\n/g, '\n');
+              str = str.replace(/\\t/g, '\t');
+              str = str.replace(/\\r/g, '\r');
+              str = str.replace(/\\\\/g, '\\');
+              stdout += str;
+            }
+          }
+          // Handle endl
+          else if (part.trim() === 'endl' || part.trim() === 'std::endl') {
+            stdout += '\n';
+          }
+          // Handle '\n' character
+          else if (part.includes("'\\n'")) {
+            stdout += '\n';
+          }
+          // Handle simple numbers and variables (just show them as is)
+          else if (/^[a-zA-Z_]\w*$/.test(part.trim()) || /^\d+$/.test(part.trim())) {
+            stdout += part.trim();
+          }
+        }
       }
 
-      // If no output was found, show a helpful message
+      // If no output was found, check if there's a cout at all
       if (!stdout) {
-        stdout = '✅ Program compiled successfully!\n\n';
-        stdout += '📝 Note: This is a basic interpreter for demonstration.\n';
-        stdout += 'It can show output from cout statements.\n\n';
-        stdout += 'For full C++ compilation with:\n';
-        stdout += '  • Complex logic and calculations\n';
-        stdout += '  • User input (cin)\n';
-        stdout += '  • STL containers and algorithms\n';
-        stdout += '  • Classes and templates\n\n';
-        stdout += 'Use online compilers:\n';
-        stdout += '  → https://compiler-explorer.com\n';
-        stdout += '  → https://www.onlinegdb.com\n';
-        stdout += '  → https://replit.com';
+        if (code.includes('cout') || code.includes('std::cout')) {
+          stdout = '✅ Program compiled successfully!\n\n';
+          stdout += '⚠️ Note: Output parsing may be limited for complex expressions.\n';
+          stdout += 'The interpreter can show:\n';
+          stdout += '  • String literals in cout statements\n';
+          stdout += '  • Simple variable names\n';
+          stdout += '  • endl and \\n line breaks\n\n';
+          stdout += 'For full output with:\n';
+          stdout += '  • Calculations and expressions\n';
+          stdout += '  • User input (cin)\n';
+          stdout += '  • Complex logic\n\n';
+          stdout += 'Use online compilers:\n';
+          stdout += '  → https://compiler-explorer.com\n';
+          stdout += '  → https://www.onlinegdb.com';
+        } else {
+          stdout = '✅ Program compiled successfully!\n\n';
+          stdout += '📝 No output statements (cout) found in your code.\n';
+          stdout += 'Add cout statements to see output!';
+        }
       }
 
       return {

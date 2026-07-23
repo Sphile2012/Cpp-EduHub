@@ -88,6 +88,11 @@ export default function QuizPage() {
     if (hasAnsweredCurrent) return;
     setAnswers(prev => ({ ...prev, [currentQ.id]: answer }));
     setShowExplanation(true);
+    
+    // Update score immediately if correct
+    if (answer === currentQ.correctAnswer) {
+      setScore(prev => prev + 1);
+    }
   };
 
   const handleNext = () => {

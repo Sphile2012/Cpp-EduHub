@@ -5,16 +5,16 @@ import { useLocalProgress } from "@/hooks/use-local-progress";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SimpleSyntaxHighlighter } from "@/components/ui/syntax-highlighter";
-import { CheckCircle2, XCircle, Trophy, ArrowRight, RotateCcw, Badge } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle2, XCircle, Trophy, ArrowRight, RotateCcw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
 
 export default function QuizPage() {
-  const { lessonId } = useParams<{ lessonId: string }>();
+  const { lessonId: lessonIdParam } = useParams<{ lessonId: string }>();
   const [_, setLocation] = useLocation();
-  const { data: questions, isLoading } = useGetLessonQuiz(lessonId || "", { 
-    query: { enabled: !!lessonId } 
-  });
+  const lessonId = lessonIdParam || "";
+  const { data: questions, isLoading } = useGetLessonQuiz(lessonId);
   const { saveQuizScore } = useLocalProgress();
 
   const [currentIndex, setCurrentIndex] = useState(0);

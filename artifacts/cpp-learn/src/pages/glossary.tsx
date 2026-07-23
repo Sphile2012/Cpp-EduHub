@@ -1,4 +1,4 @@
-import { useGetGlossary } from "@workspace/api-client-react";
+import { useGetGlossary } from "@/hooks/use-static-data";
 import { Link } from "wouter";
 import { Search, Library, Hash } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ export default function GlossaryList() {
     t.shortDefinition.toLowerCase().includes(search.toLowerCase()) ||
     t.category.toLowerCase().includes(search.toLowerCase())
   ) || [];
+  const hasTerms = terms?.length > 0;
 
   // Group by category
   const grouped = filteredTerms.reduce((acc, term) => {
@@ -48,6 +49,10 @@ export default function GlossaryList() {
 
       {isLoading ? (
         <div className="text-center py-12 animate-pulse">Loading terms...</div>
+      ) : !hasTerms ? (
+        <div className="text-center py-12 text-muted-foreground bg-card border rounded-xl">
+          The glossary is currently empty. Add terms or check your content source.
+        </div>
       ) : (
         <div className="space-y-12">
           {Object.entries(grouped).map(([category, items]) => (

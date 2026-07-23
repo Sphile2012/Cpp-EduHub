@@ -1,4 +1,4 @@
-import { useGetLessons, useGetProgress } from "@workspace/api-client-react";
+import { useGetLessons, useGetProgress } from "@/hooks/use-static-data";
 import { useLocalProgress } from "@/hooks/use-local-progress";
 import { Link } from "wouter";
 import { BookOpen, Target, CheckCircle2, Flame, Trophy, Activity, ArrowRight, Play, Award, Layers, TerminalSquare, Sparkles } from "lucide-react";

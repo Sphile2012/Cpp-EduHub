@@ -1,5 +1,5 @@
 import { useParams, Link, useLocation } from "wouter";
-import { useGetLesson } from "@workspace/api-client-react";
+import { useGetLesson } from "@/hooks/use-static-data";
 import { PlaygroundPanel } from "@/components/playground/playground-panel";
 import { SimpleSyntaxHighlighter } from "@/components/ui/syntax-highlighter";
 import { Button } from "@/components/ui/button";
@@ -7,18 +7,24 @@ import { useLocalProgress } from "@/hooks/use-local-progress";
 import { 
   BookOpen, ChevronLeft, ChevronRight, CheckCircle2, 
   Lightbulb, AlertTriangle, Info, PlaySquare,
-  Terminal
+  Terminal, Bot, PanelRightClose, PanelRightOpen
 } from "lucide-react";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { linkifyContent } from "@/components/concept-explorer/concept-link";
+import { LoopVisualizer } from "@/components/visualizer/loop-visualizer";
+import { MemoryVisualizer } from "@/components/visualizer/memory-visualizer";
+import { AIChat } from "@/components/ai-tutor/ai-chat";
 
 export default function LessonDetail() {
   const { id } = useParams<{ id: string }>();
   const [_, setLocation] = useLocation();
-  const { data: lesson, isLoading } = useGetLesson(id, { query: { enabled: !!id } });
+  const lessonId = id || "";
+  const { data: lesson, isLoading } = useGetLesson(lessonId);
   const { markLessonComplete, completedLessonIds } = useLocalProgress();
   
   const [playgroundCode, setPlaygroundCode] = useState<string>("");
+  const [showAITutor, setShowAITutor] = useState(false);
 
   if (isLoading || !lesson) {
     return (
@@ -42,7 +48,9 @@ export default function LessonDetail() {
   return (
     <div className="h-screen flex flex-col md:flex-row overflow-hidden bg-background">
       {/* Left Panel: Content */}
-      <div className="w-full md:w-[55%] flex flex-col h-full border-r overflow-hidden bg-card/30">
+      <div className={`w-full flex flex-col h-full border-r overflow-hidden bg-card/30 transition-all duration-300 ${
+        showAITutor ? 'md:w-[40%]' : 'md:w-[55%]'
+      }`}>
         {/* Sticky Header */}
         <div className="h-16 border-b bg-background flex items-center justify-between px-6 flex-shrink-0 z-10 sticky top-0">
           <div className="flex items-center gap-4">
@@ -54,11 +62,23 @@ export default function LessonDetail() {
               <h1 className="font-bold font-handwriting text-xl truncate max-w-[200px] sm:max-w-xs">{lesson.title}</h1>
             </div>
           </div>
-          {isCompleted && (
-            <div className="flex items-center gap-1.5 text-green-500 text-sm font-medium">
-              <CheckCircle2 className="w-4 h-4" /> <span className="hidden sm:inline">Completed</span>
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {isCompleted && (
+              <div className="flex items-center gap-1.5 text-green-500 text-sm font-medium">
+                <CheckCircle2 className="w-4 h-4" /> <span className="hidden sm:inline">Completed</span>
+              </div>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowAITutor(!showAITutor)}
+              className="gap-2"
+            >
+              <Bot className="w-4 h-4" />
+              {showAITutor ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
+              <span className="hidden lg:inline">{showAITutor ? 'Hide' : 'Ask'} AI Tutor</span>
+            </Button>
+          </div>
         </div>
 
         {/* Scrollable Content Area */}
@@ -82,7 +102,7 @@ export default function LessonDetail() {
                 
                 {section.type === 'text' && (
                   <div className="prose prose-invert max-w-none text-foreground leading-relaxed" 
-                       dangerouslySetInnerHTML={{ __html: section.body.replace(/\n/g, '<br/>') }} />
+                       dangerouslySetInnerHTML={{ __html: linkifyContent(section.body.replace(/\n/g, '<br/>')) }} />
                 )}
                 
                 {section.type === 'code' && section.code && (
@@ -143,6 +163,95 @@ export default function LessonDetail() {
               </div>
             )}
 
+            {/* Interactive Visualizers - Show for specific lessons */}
+            {(lesson.id.includes('loop') || lesson.title.toLowerCase().includes('loop')) && (
+              <div className="mt-12 pt-8 border-t space-y-6">
+                <h3 className="text-xl font-bold flex items-center gap-2">
+                  🔄 Loop Visualizer
+                </h3>
+                <p className="text-muted-foreground">
+                  Watch how loops execute step by step. Use the controls to play, pause, and step through the iterations.
+                </p>
+                <LoopVisualizer 
+                  code="for(int i = 0; i < 5; i++) {
+    cout << i << endl;
+}"
+                  title="For Loop Example"
+                />
+              </div>
+            )}
+
+            {(lesson.id.includes('pointer') || lesson.title.toLowerCase().includes('pointer') || 
+              lesson.title.toLowerCase().includes('memory')) && (
+              <div className="mt-12 pt-8 border-t space-y-6">
+                <h3 className="text-xl font-bold flex items-center gap-2">
+                  💾 Memory Visualizer
+                </h3>
+                <p className="text-muted-foreground">
+                  See how pointers work in memory. Watch how variables are stored and how pointers reference them.
+                </p>
+                <div className="space-y-6">
+                  {/* Example 1: Basic Pointer */}
+                  <div>
+                    <h4 className="font-semibold mb-3">Example: Basic Pointer</h4>
+                    <MemoryVisualizer
+                      cells={[
+                        { 
+                          address: '0x1000', 
+                          name: 'age', 
+                          value: '25', 
+                          type: 'variable' as const,
+                          region: 'stack' as const
+                        },
+                        { 
+                          address: '0x2000', 
+                          name: 'ptr', 
+                          value: '0x1000', 
+                          type: 'pointer' as const,
+                          pointsTo: '0x1000',
+                          region: 'stack' as const
+                        }
+                      ]}
+                      title="int* ptr = &age"
+                    />
+                  </div>
+
+                  {/* Example 2: Multiple Pointers */}
+                  <div>
+                    <h4 className="font-semibold mb-3">Example: Pointer Chain</h4>
+                    <MemoryVisualizer
+                      cells={[
+                        { 
+                          address: '0x1000', 
+                          name: 'value', 
+                          value: '42', 
+                          type: 'variable' as const,
+                          region: 'stack' as const
+                        },
+                        { 
+                          address: '0x2000', 
+                          name: 'ptr1', 
+                          value: '0x1000', 
+                          type: 'pointer' as const,
+                          pointsTo: '0x1000',
+                          region: 'stack' as const
+                        },
+                        { 
+                          address: '0x3000', 
+                          name: 'ptr2', 
+                          value: '0x2000', 
+                          type: 'pointer' as const,
+                          pointsTo: '0x2000',
+                          region: 'stack' as const
+                        }
+                      ]}
+                      title="int** ptr2 = &ptr1"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Key Points Summary */}
             {lesson.keyPoints.length > 0 && (
               <div className="mt-12 p-6 bg-card border rounded-xl">
@@ -195,8 +304,25 @@ export default function LessonDetail() {
         </div>
       </div>
 
+      {/* Middle Panel: AI Tutor (Collapsible) */}
+      {showAITutor && (
+        <div className="hidden md:block md:w-[25%] h-full border-r bg-background/50 p-4">
+          <AIChat
+            lessonContext={{
+              lessonId: lesson.id,
+              lessonTitle: lesson.title,
+              currentTopic: lesson.keyPoints[0]
+            }}
+            codeContext={playgroundCode}
+            onInsertCode={(code) => setPlaygroundCode(code)}
+          />
+        </div>
+      )}
+
       {/* Right Panel: Playground */}
-      <div className="hidden md:block md:w-[45%] h-full p-4 bg-[#111]">
+      <div className={`hidden md:block h-full p-4 bg-[#111] transition-all duration-300 ${
+        showAITutor ? 'md:w-[35%]' : 'md:w-[45%]'
+      }`}>
         <PlaygroundPanel initialCode={playgroundCode || lesson.codeExamples?.[0]?.code || ""} />
       </div>
     </div>

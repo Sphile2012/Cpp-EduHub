@@ -1,4 +1,4 @@
-import { useGetLessons } from "@workspace/api-client-react";
+import { useGetLessons } from "@/hooks/use-static-data";
 import { useLocalProgress } from "@/hooks/use-local-progress";
 import { Link } from "wouter";
 import { BookOpen, CheckCircle2, Clock, Signal } from "lucide-react";
@@ -17,6 +17,7 @@ export default function LessonBrowser() {
   const filteredLessons = lessons?.filter(
     (l) => filter === "all" || l.difficulty === filter
   ) || [];
+  const hasLessons = lessons?.length > 0;
 
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-8">
@@ -59,16 +60,15 @@ export default function LessonBrowser() {
       <div className="grid gap-4 relative before:absolute before:inset-y-0 before:left-[27px] before:w-[2px] before:bg-border before:-z-10">
         {isLoading ? (
           <div className="text-center py-12 text-muted-foreground animate-pulse">Loading syllabus...</div>
-        ) : (
+        ) : hasLessons ? (
           filteredLessons.map((lesson, i) => {
             const isCompleted = completedLessonIds.includes(lesson.id);
             const isNext = !isCompleted && (!lessons?.[i-1] || completedLessonIds.includes(lessons[i-1].id));
             
             return (
               <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.05 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 key={lesson.id}
                 className="relative flex items-center gap-6 group"
               >
@@ -119,9 +119,13 @@ export default function LessonBrowser() {
               </motion.div>
             );
           })
+        ) : (
+          <div className="text-center py-12 bg-card border rounded-xl">
+            <p className="text-muted-foreground">Curriculum is currently empty. Add lessons or check your content source.</p>
+          </div>
         )}
         
-        {filteredLessons.length === 0 && !isLoading && (
+        {hasLessons && filteredLessons.length === 0 && !isLoading && (
           <div className="text-center py-12 bg-card border rounded-xl">
             <p className="text-muted-foreground">No lessons found for this difficulty.</p>
           </div>

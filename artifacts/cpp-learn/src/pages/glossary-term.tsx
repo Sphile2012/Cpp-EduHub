@@ -1,14 +1,13 @@
 import { useParams, Link } from "wouter";
-import { useGetGlossaryTerm } from "@workspace/api-client-react";
+import { useGetGlossaryTerm } from "@/hooks/use-static-data";
 import { SimpleSyntaxHighlighter } from "@/components/ui/syntax-highlighter";
 import { ChevronLeft, Info, AlertTriangle, Lightbulb, Link2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export default function GlossaryTerm() {
   const { slug } = useParams<{ slug: string }>();
-  const { data: term, isLoading } = useGetGlossaryTerm(slug || "", {
-    query: { enabled: !!slug }
-  });
+  const slugValue = slug || "";
+  const { data: term, isLoading } = useGetGlossaryTerm(slugValue);
 
   if (isLoading || !term) return <div className="p-8 text-center animate-pulse">Loading term...</div>;
 

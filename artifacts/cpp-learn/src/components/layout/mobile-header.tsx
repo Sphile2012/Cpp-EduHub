@@ -179,12 +179,12 @@ export function MobileHeader() {
                   variant="outline"
                   className="w-full justify-between gap-2 bg-background/50 hover:bg-accent/10"
                 >
-                  <div className="flex items-center gap-2">
-                    <Languages className="w-4 h-4" />
-                    <span className="text-sm font-medium">
-                      {LANGUAGES[currentLanguage].icon} {LANGUAGES[currentLanguage].displayName}
-                    </span>
-                  </div>
+              <div className="flex items-center gap-2">
+                <Languages className="w-4 h-4" />
+                <span className="text-sm font-medium">
+                  {currentLanguage ? `${LANGUAGES[currentLanguage].icon} ${LANGUAGES[currentLanguage].displayName}` : 'Select Language'}
+                </span>
+              </div>
                   <ChevronDown className="w-4 h-4 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>

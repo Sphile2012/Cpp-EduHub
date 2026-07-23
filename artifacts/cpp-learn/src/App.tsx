@@ -36,15 +36,17 @@ const queryClient = new QueryClient({
 
 // Component that conditionally renders based on language selection
 function AppRoutes() {
-  const { hasSelectedLanguage } = useLanguage();
+  const { hasSelectedLanguage, currentLanguage } = useLanguage();
   const { isAuthenticated } = useAuth();
 
-  // If no language selected, show the language selector
+  // If no language selected, automatically select C++ (default) instead of showing selector
   if (!hasSelectedLanguage) {
-    return <LanguageSelector />;
+    // Auto-select C++ on first visit
+    const { setLanguage } = useLanguage();
+    setLanguage('cpp');
   }
 
-  // Otherwise, show the main app with layout
+  // Always show the main app with layout
   return (
     <AppLayout>
       <Switch>

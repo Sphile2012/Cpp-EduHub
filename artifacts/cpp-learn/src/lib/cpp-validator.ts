@@ -36,11 +36,11 @@ export function validateCppCode(code: string): ValidationResult {
   
   // Check for common syntax errors
   checkBrackets(code, errors);
-  checkSemicolons(lines, errors);
+  checkSemicolons(lines, errors, warnings);
   checkIncludeGuards(code, warnings);
   checkMainFunction(code, errors, warnings);
-  checkCommonMistakes(lines, errors, warnings);
-  checkCodeQuality(lines, warnings, suggestions);
+  checkCommonMistakes(lines, errors, warnings, code);
+  checkCodeQuality(lines, warnings, suggestions, code);
   checkMemoryManagement(code, errors, warnings);
   checkNamingConventions(lines, warnings);
   
@@ -110,7 +110,7 @@ function checkBrackets(code: string, errors: ValidationError[]) {
   }
 }
 
-function checkSemicolons(lines: string[], errors: ValidationError[]) {
+function checkSemicolons(lines: string[], errors: ValidationError[], warnings: ValidationWarning[]) {
   const classPattern = /^\s*class\s+\w+/;
   const functionPattern = /^\s*(?:void|int|double|float|char|bool|string|\w+::\w+)\s+\w+\s*\([^)]*\)\s*$/;
   const controlPatterns = [/^\s*if\s*\(/, /^\s*else\s*$/, /^\s*for\s*\(/, /^\s*while\s*\(/, /^\s*do\s*$/];
@@ -181,7 +181,7 @@ function checkMainFunction(code: string, errors: ValidationError[], warnings: Va
   }
 }
 
-function checkCommonMistakes(lines: string[], errors: ValidationError[], warnings: ValidationWarning[]) {
+function checkCommonMistakes(lines: string[], errors: ValidationError[], warnings: ValidationWarning[], code: string) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     
@@ -239,7 +239,7 @@ function checkCommonMistakes(lines: string[], errors: ValidationError[], warning
   }
 }
 
-function checkCodeQuality(lines: string[], warnings: ValidationWarning[], suggestions: string[]) {
+function checkCodeQuality(lines: string[], warnings: ValidationWarning[], suggestions: string[], code: string) {
   let hasIO = false;
   let hasVector = false;
   let hasSmartPointers = false;

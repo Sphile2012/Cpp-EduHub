@@ -31,7 +31,7 @@ export function TermTooltip({ term, children, className }: TermTooltipProps) {
         onClick={() => setIsOpen(!isOpen)}
         onMouseEnter={() => setIsOpen(true)}
         onMouseLeave={() => setIsOpen(false)}
-        aria-label={`Definition of ${definition.name}`}
+        aria-label={`Definition of ${definition.term}`}
       >
         {children}
       </button>
@@ -60,14 +60,14 @@ export function TermTooltip({ term, children, className }: TermTooltipProps) {
             <div className="flex items-start justify-between gap-2">
               <div>
                 <h4 className="font-mono font-bold text-lg text-primary">
-                  {definition.name}
+                  {definition.term}
                 </h4>
                 <p className="text-xs text-muted-foreground capitalize">
                   {definition.category}
                 </p>
               </div>
               <Link 
-                href={`/glossary/${definition.glossarySlug}`}
+                href={`/glossary/${definition.slug}`}
                 className="flex items-center gap-1 text-xs text-primary hover:underline"
                 onClick={() => setIsOpen(false)}
               >

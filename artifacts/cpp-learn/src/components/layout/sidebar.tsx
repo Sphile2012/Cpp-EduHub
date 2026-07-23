@@ -134,7 +134,7 @@ export function Sidebar({ className }: { className?: string }) {
               <div className="flex items-center gap-2">
                 <Languages className="w-4 h-4" />
                 <span className="text-sm font-medium">
-                  {LANGUAGES[currentLanguage].icon} {LANGUAGES[currentLanguage].displayName}
+                  {currentLanguage ? `${LANGUAGES[currentLanguage].icon} ${LANGUAGES[currentLanguage].displayName}` : 'Select Language'}
                 </span>
               </div>
               <ChevronDown className="w-4 h-4 opacity-50" />

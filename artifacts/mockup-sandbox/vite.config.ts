@@ -37,11 +37,16 @@ export default defineConfig({
     ...(process.env.NODE_ENV !== "production" &&
     process.env.REPL_ID !== undefined
       ? [
-          await import("@replit/vite-plugin-cartographer").then((m) =>
-            m.cartographer({
-              root: path.resolve(import.meta.dirname, ".."),
-            }),
-          ),
+          (async () => {
+            try {
+              const cartographer = await import("@replit/vite-plugin-cartographer");
+              return cartographer.cartographer({
+                root: path.resolve(import.meta.dirname, ".."),
+              });
+            } catch {
+              return null;
+            }
+          })(),
         ]
       : []),
   ],

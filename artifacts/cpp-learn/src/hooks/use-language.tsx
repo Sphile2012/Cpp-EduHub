@@ -98,7 +98,12 @@ export function useLanguage() {
   if (!context) {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
-  return context;
+  // Return context with aliases for convenience
+  return {
+    ...context,
+    currentLanguage: context.selectedLanguage,
+    setLanguage: context.setSelectedLanguage,
+  };
 }
 
 // Hook to get language-specific content

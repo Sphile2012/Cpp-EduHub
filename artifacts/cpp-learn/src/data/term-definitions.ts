@@ -1,540 +1,413 @@
 /**
- * C++ Term Definitions Database
- * Quick-access definitions for interactive tooltips
+ * C++ Term Definitions - Instant popover content
+ * No API calls needed - all data embedded for instant display
  */
 
 export interface TermDefinition {
-  id: string;
-  name: string;
-  category: 'keyword' | 'concept' | 'stl' | 'operator' | 'type';
+  term: string;
+  slug: string;
+  category: string;
   shortDefinition: string;
-  example: string;
-  glossarySlug: string;
-  relatedTerms: string[];
+  example?: string;
+  relatedTerms?: string[];
 }
 
 export const termDefinitions: Record<string, TermDefinition> = {
-  // Basic Types
-  "int": {
-    id: "int",
-    name: "int",
-    category: "type",
-    shortDefinition: "Integer type for whole numbers (typically -2 billion to +2 billion).",
-    example: "int age = 25;\nint score = -10;",
-    glossarySlug: "data-types",
-    relatedTerms: ["double", "char", "bool", "variable"]
+  // Memory Management
+  'pointer': {
+    term: 'Pointer',
+    slug: 'pointer',
+    category: 'Memory',
+    shortDefinition: 'A variable that stores a memory address. Use * to declare and & to get address.',
+    example: 'int x = 42;\nint* ptr = &x; // ptr points to x\ncout << *ptr;  // prints 42',
+    relatedTerms: ['reference', 'address', 'dereference']
+  },
+  'pointers': {
+    term: 'Pointers',
+    slug: 'pointer',
+    category: 'Memory',
+    shortDefinition: 'Variables that store memory addresses. Essential for dynamic memory and data structures.',
+    example: 'int* ptr = new int(5);\ndelete ptr;',
+    relatedTerms: ['reference', 'memory', 'new', 'delete']
+  },
+  'reference': {
+    term: 'Reference',
+    slug: 'reference',
+    category: 'Memory',
+    shortDefinition: 'An alias for another variable. Declared with & and must be initialized.',
+    example: 'int x = 10;\nint& ref = x;  // ref is alias for x\nref = 20;      // x is now 20',
+    relatedTerms: ['pointer', 'alias', 'pass-by-reference']
+  },
+  'nullptr': {
+    term: 'nullptr',
+    slug: 'nullptr',
+    category: 'Memory',
+    shortDefinition: 'A null pointer constant (C++11). Safer than NULL or 0.',
+    example: 'int* ptr = nullptr;\nif (ptr == nullptr) { /* safe */ }',
+    relatedTerms: ['pointer', 'null']
+  },
+  'new': {
+    term: 'new',
+    slug: 'new',
+    category: 'Memory',
+    shortDefinition: 'Allocates memory on the heap. Must be freed with delete.',
+    example: 'int* p = new int(5);\nint* arr = new int[10];\ndelete p;\ndelete[] arr;',
+    relatedTerms: ['delete', 'heap', 'memory-leak']
+  },
+  'delete': {
+    term: 'delete',
+    slug: 'delete',
+    category: 'Memory',
+    shortDefinition: 'Frees memory allocated with new. Use delete[] for arrays.',
+    example: 'int* p = new int(5);\ndelete p;  // free memory',
+    relatedTerms: ['new', 'memory-leak', 'heap']
   },
   
-  "double": {
-    id: "double",
-    name: "double",
-    category: "type",
-    shortDefinition: "Floating-point type for decimal numbers with ~15 digits of precision.",
-    example: "double pi = 3.14159;\ndouble price = 19.99;",
-    glossarySlug: "data-types",
-    relatedTerms: ["float", "int", "variable"]
+  // OOP
+  'class': {
+    term: 'Class',
+    slug: 'class',
+    category: 'OOP',
+    shortDefinition: 'A blueprint for creating objects. Can contain data (members) and functions (methods).',
+    example: 'class Dog {\nprivate:\n  string name;\npublic:\n  void bark() { cout << "Woof!"; }\n};',
+    relatedTerms: ['object', 'constructor', 'encapsulation']
+  },
+  'classes': {
+    term: 'Classes',
+    slug: 'class',
+    category: 'OOP',
+    shortDefinition: 'Blueprints for creating objects with data and behavior.',
+    relatedTerms: ['object', 'oop', 'struct']
+  },
+  'object': {
+    term: 'Object',
+    slug: 'object',
+    category: 'OOP',
+    shortDefinition: 'An instance of a class. Contains actual data and can call methods.',
+    example: 'Dog myDog;  // myDog is an object of class Dog\nmyDog.bark();',
+    relatedTerms: ['class', 'instance', 'constructor']
+  },
+  'constructor': {
+    term: 'Constructor',
+    slug: 'constructor',
+    category: 'OOP',
+    shortDefinition: 'A special function that runs when an object is created. Initializes members.',
+    example: 'class Point {\npublic:\n  Point(int x, int y) : x(x), y(y) {}\nprivate:\n  int x, y;\n};',
+    relatedTerms: ['destructor', 'initialization', 'class']
+  },
+  'destructor': {
+    term: 'Destructor',
+    slug: 'destructor',
+    category: 'OOP',
+    shortDefinition: 'A special function (~ClassName) that runs when object is destroyed. Cleans up resources.',
+    example: 'class File {\npublic:\n  ~File() { close(); }  // cleanup\n};',
+    relatedTerms: ['constructor', 'raii', 'cleanup']
+  },
+  'inheritance': {
+    term: 'Inheritance',
+    slug: 'inheritance',
+    category: 'OOP',
+    shortDefinition: 'Creating a new class from an existing class. Child class inherits parent members.',
+    example: 'class Animal { };\nclass Dog : public Animal { };  // Dog inherits from Animal',
+    relatedTerms: ['polymorphism', 'base-class', 'derived-class']
+  },
+  'polymorphism': {
+    term: 'Polymorphism',
+    slug: 'polymorphism',
+    category: 'OOP',
+    shortDefinition: 'Ability of objects to take multiple forms. Implemented via virtual functions.',
+    example: 'virtual void speak() { }  // can be overridden',
+    relatedTerms: ['virtual', 'override', 'inheritance']
+  },
+  'encapsulation': {
+    term: 'Encapsulation',
+    slug: 'encapsulation',
+    category: 'OOP',
+    shortDefinition: 'Hiding internal details using private/protected. Access via public methods.',
+    example: 'class BankAccount {\nprivate:\n  double balance;  // hidden\npublic:\n  void deposit(double amt) { balance += amt; }\n};',
+    relatedTerms: ['private', 'public', 'data-hiding']
+  },
+  'virtual': {
+    term: 'virtual',
+    slug: 'virtual',
+    category: 'OOP',
+    shortDefinition: 'Keyword that allows a function to be overridden in derived classes.',
+    example: 'virtual void speak() { cout << "..."; }',
+    relatedTerms: ['override', 'polymorphism', 'inheritance']
+  },
+  'override': {
+    term: 'override',
+    slug: 'override',
+    category: 'OOP',
+    shortDefinition: 'Keyword (C++11) that explicitly marks a function as overriding a virtual function.',
+    example: 'void speak() override { cout << "Woof!"; }',
+    relatedTerms: ['virtual', 'polymorphism']
   },
   
-  "char": {
-    id: "char",
-    name: "char",
-    category: "type",
-    shortDefinition: "Character type that stores a single character (1 byte).",
-    example: "char grade = 'A';\nchar symbol = '@';",
-    glossarySlug: "data-types",
-    relatedTerms: ["string", "int", "ascii"]
+  // STL
+  'vector': {
+    term: 'vector',
+    slug: 'vector',
+    category: 'STL',
+    shortDefinition: 'A dynamic array that grows automatically. Part of the Standard Template Library.',
+    example: 'vector<int> nums = {1, 2, 3};\nnums.push_back(4);  // now {1,2,3,4}',
+    relatedTerms: ['array', 'stl', 'container']
+  },
+  'vectors': {
+    term: 'vectors',
+    slug: 'vector',
+    category: 'STL',
+    shortDefinition: 'Dynamic arrays from STL. Use push_back() to add, size() for length.',
+    relatedTerms: ['array', 'stl', 'container']
+  },
+  'array': {
+    term: 'array',
+    slug: 'array',
+    category: 'Data Structures',
+    shortDefinition: 'Fixed-size collection of elements of same type. Access via index [0, 1, 2...].',
+    example: 'int arr[5] = {1, 2, 3, 4, 5};\ncout << arr[0];  // prints 1',
+    relatedTerms: ['vector', 'index', 'subscript']
+  },
+  'map': {
+    term: 'map',
+    slug: 'map',
+    category: 'STL',
+    shortDefinition: 'Stores key-value pairs. Keys are unique and sorted.',
+    example: 'map<string, int> ages;\nages["Alice"] = 25;',
+    relatedTerms: ['unordered_map', 'pair', 'stl']
+  },
+  'set': {
+    term: 'set',
+    slug: 'set',
+    category: 'STL',
+    shortDefinition: 'Collection of unique elements, automatically sorted.',
+    example: 'set<int> numbers = {5, 2, 8, 2};\n// contains: 2, 5, 8',
+    relatedTerms: ['multiset', 'unordered_set', 'stl']
+  },
+  'string': {
+    term: 'string',
+    slug: 'string',
+    category: 'STL',
+    shortDefinition: 'Class for text manipulation. Part of STL. Use #include <string>.',
+    example: 'string name = "Alice";\nname += " Smith";  // concatenate',
+    relatedTerms: ['char', 'text', 'stl']
   },
   
-  "bool": {
-    id: "bool",
-    name: "bool",
-    category: "type",
-    shortDefinition: "Boolean type that stores true or false.",
-    example: "bool isValid = true;\nbool hasError = false;",
-    glossarySlug: "data-types",
-    relatedTerms: ["if", "while", "operator"]
-  },
-  
-  "string": {
-    id: "string",
-    name: "string",
-    category: "stl",
-    shortDefinition: "STL type for sequences of characters (text). Requires #include <string>.",
-    example: "#include <string>\nstring name = \"Alice\";\nstring msg = \"Hello!\";",
-    glossarySlug: "strings",
-    relatedTerms: ["char", "vector", "stl"]
-  },
-
-  // STL Containers
-  "vector": {
-    id: "vector",
-    name: "vector",
-    category: "stl",
-    shortDefinition: "Dynamic array from STL that automatically resizes. Requires #include <vector>.",
-    example: "#include <vector>\nvector<int> nums = {1, 2, 3};\nnums.push_back(4);",
-    glossarySlug: "vector",
-    relatedTerms: ["array", "stl", "push_back", "iterator"]
-  },
-  
-  "array": {
-    id: "array",
-    name: "array",
-    category: "concept",
-    shortDefinition: "Fixed-size collection of elements of the same type.",
-    example: "int numbers[5] = {1, 2, 3, 4, 5};\nnumbers[0] = 10;",
-    glossarySlug: "arrays",
-    relatedTerms: ["vector", "int", "index"]
-  },
-  
-  "map": {
-    id: "map",
-    name: "map",
-    category: "stl",
-    shortDefinition: "Associative container that stores key-value pairs in sorted order.",
-    example: "#include <map>\nmap<string, int> ages;\nages[\"Alice\"] = 25;",
-    glossarySlug: "map",
-    relatedTerms: ["unordered_map", "pair", "stl"]
-  },
-  
-  "set": {
-    id: "set",
-    name: "set",
-    category: "stl",
-    shortDefinition: "Container that stores unique elements in sorted order.",
-    example: "#include <set>\nset<int> numbers = {3, 1, 4, 1};\n// Stores: {1, 3, 4}",
-    glossarySlug: "set",
-    relatedTerms: ["unordered_set", "vector", "stl"]
-  },
-
-  // Pointers & Memory
-  "pointer": {
-    id: "pointer",
-    name: "pointer",
-    category: "concept",
-    shortDefinition: "Variable that stores the memory address of another variable.",
-    example: "int x = 42;\nint* ptr = &x;\ncout << *ptr; // 42",
-    glossarySlug: "pointers",
-    relatedTerms: ["reference", "address", "dereference", "new", "delete"]
-  },
-  
-  "reference": {
-    id: "reference",
-    name: "reference",
-    category: "concept",
-    shortDefinition: "Alias for an existing variable. Changes affect the original.",
-    example: "int x = 10;\nint& ref = x;\nref = 20; // x is now 20",
-    glossarySlug: "references",
-    relatedTerms: ["pointer", "pass-by-reference", "function"]
-  },
-  
-  "new": {
-    id: "new",
-    name: "new",
-    category: "keyword",
-    shortDefinition: "Allocates memory on the heap. Must be freed with delete.",
-    example: "int* ptr = new int(42);\ndelete ptr;",
-    glossarySlug: "dynamic-memory",
-    relatedTerms: ["delete", "pointer", "heap", "malloc"]
-  },
-  
-  "delete": {
-    id: "delete",
-    name: "delete",
-    category: "keyword",
-    shortDefinition: "Frees memory allocated with new. Use delete[] for arrays.",
-    example: "int* p = new int(5);\ndelete p;\nint* arr = new int[10];\ndelete[] arr;",
-    glossarySlug: "dynamic-memory",
-    relatedTerms: ["new", "pointer", "memory-leak"]
-  },
-  
-  "nullptr": {
-    id: "nullptr",
-    name: "nullptr",
-    category: "keyword",
-    shortDefinition: "Null pointer constant introduced in C++11. Safer than NULL.",
-    example: "int* ptr = nullptr;\nif (ptr == nullptr) {\n    // pointer is null\n}",
-    glossarySlug: "pointers",
-    relatedTerms: ["pointer", "null", "reference"]
-  },
-
-  // OOP Concepts
-  "class": {
-    id: "class",
-    name: "class",
-    category: "keyword",
-    shortDefinition: "Blueprint for creating objects with data (attributes) and functions (methods).",
-    example: "class Dog {\npublic:\n    string name;\n    void bark() { cout << \"Woof!\"; }\n};",
-    glossarySlug: "classes",
-    relatedTerms: ["object", "struct", "constructor", "public", "private"]
-  },
-  
-  "object": {
-    id: "object",
-    name: "object",
-    category: "concept",
-    shortDefinition: "Instance of a class with its own data.",
-    example: "class Car { };\nCar myCar; // myCar is an object\nCar* ptr = new Car(); // pointer to object",
-    glossarySlug: "objects",
-    relatedTerms: ["class", "instance", "constructor"]
-  },
-  
-  "constructor": {
-    id: "constructor",
-    name: "constructor",
-    category: "concept",
-    shortDefinition: "Special method that runs when an object is created. Same name as class.",
-    example: "class Point {\npublic:\n    Point(int x, int y) {\n        this->x = x;\n    }\n};",
-    glossarySlug: "constructors",
-    relatedTerms: ["destructor", "class", "this"]
-  },
-  
-  "destructor": {
-    id: "destructor",
-    name: "destructor",
-    category: "concept",
-    shortDefinition: "Special method that runs when object is destroyed. Name starts with ~.",
-    example: "class Resource {\npublic:\n    ~Resource() {\n        // cleanup\n    }\n};",
-    glossarySlug: "destructors",
-    relatedTerms: ["constructor", "raii", "delete"]
-  },
-  
-  "inheritance": {
-    id: "inheritance",
-    name: "inheritance",
-    category: "concept",
-    shortDefinition: "Mechanism where a class derives properties from a parent class.",
-    example: "class Animal { };\nclass Dog : public Animal {\n    // Dog inherits from Animal\n};",
-    glossarySlug: "inheritance",
-    relatedTerms: ["polymorphism", "derived", "base", "virtual"]
-  },
-  
-  "polymorphism": {
-    id: "polymorphism",
-    name: "polymorphism",
-    category: "concept",
-    shortDefinition: "Ability to use a derived class through a base class pointer/reference.",
-    example: "class Base {\n    virtual void print() { }\n};\nclass Derived : public Base {\n    void print() override { }\n};",
-    glossarySlug: "polymorphism",
-    relatedTerms: ["virtual", "override", "inheritance"]
-  },
-  
-  "virtual": {
-    id: "virtual",
-    name: "virtual",
-    category: "keyword",
-    shortDefinition: "Marks a function as overridable in derived classes (enables polymorphism).",
-    example: "class Base {\n    virtual void show() { }\n};\nclass Derived : public Base {\n    void show() override { }\n};",
-    glossarySlug: "virtual-functions",
-    relatedTerms: ["override", "polymorphism", "inheritance"]
-  },
-  
-  "override": {
-    id: "override",
-    name: "override",
-    category: "keyword",
-    shortDefinition: "Explicitly marks that a function overrides a virtual function from base class.",
-    example: "class Base {\n    virtual void f() { }\n};\nclass Derived : public Base {\n    void f() override { }\n};",
-    glossarySlug: "override",
-    relatedTerms: ["virtual", "polymorphism"]
-  },
-  
-  "public": {
-    id: "public",
-    name: "public",
-    category: "keyword",
-    shortDefinition: "Access modifier allowing members to be accessed from anywhere.",
-    example: "class MyClass {\npublic:\n    int x; // accessible everywhere\nprivate:\n    int y; // only inside class\n};",
-    glossarySlug: "access-modifiers",
-    relatedTerms: ["private", "protected", "class"]
-  },
-  
-  "private": {
-    id: "private",
-    name: "private",
-    category: "keyword",
-    shortDefinition: "Access modifier restricting members to only within the class.",
-    example: "class Account {\nprivate:\n    double balance; // hidden\npublic:\n    void deposit(double amt) { }\n};",
-    glossarySlug: "access-modifiers",
-    relatedTerms: ["public", "protected", "encapsulation"]
-  },
-  
-  "protected": {
-    id: "protected",
-    name: "protected",
-    category: "keyword",
-    shortDefinition: "Access modifier allowing access within class and derived classes.",
-    example: "class Base {\nprotected:\n    int x; // visible to derived\n};\nclass Derived : public Base { };",
-    glossarySlug: "access-modifiers",
-    relatedTerms: ["public", "private", "inheritance"]
-  },
-
   // Control Flow
-  "if": {
-    id: "if",
-    name: "if",
-    category: "keyword",
-    shortDefinition: "Conditional statement that executes code only if condition is true.",
-    example: "if (x > 10) {\n    cout << \"x is greater than 10\";\n}",
-    glossarySlug: "conditionals",
-    relatedTerms: ["else", "else-if", "bool", "switch"]
+  'loop': {
+    term: 'Loop',
+    slug: 'loop',
+    category: 'Control Flow',
+    shortDefinition: 'Repeats code multiple times. Types: for, while, do-while.',
+    example: 'for (int i = 0; i < 5; i++) {\n  cout << i << " ";\n}',
+    relatedTerms: ['for', 'while', 'iteration']
+  },
+  'for': {
+    term: 'for',
+    slug: 'for-loop',
+    category: 'Control Flow',
+    shortDefinition: 'Loop with initialization, condition, and increment in one line.',
+    example: 'for (int i = 0; i < 10; i++) { /* code */ }',
+    relatedTerms: ['while', 'loop', 'iteration']
+  },
+  'while': {
+    term: 'while',
+    slug: 'while-loop',
+    category: 'Control Flow',
+    shortDefinition: 'Loop that continues while condition is true. Checks condition before each iteration.',
+    example: 'while (x < 10) {\n  x++;\n}',
+    relatedTerms: ['for', 'do-while', 'loop']
+  },
+  'if': {
+    term: 'if',
+    slug: 'if-statement',
+    category: 'Control Flow',
+    shortDefinition: 'Executes code only if condition is true.',
+    example: 'if (x > 0) {\n  cout << "Positive";\n}',
+    relatedTerms: ['else', 'else-if', 'condition']
+  },
+  'switch': {
+    term: 'switch',
+    slug: 'switch-statement',
+    category: 'Control Flow',
+    shortDefinition: 'Multi-way branch based on value. More efficient than multiple if-else.',
+    example: 'switch (day) {\n  case 1: cout << "Mon"; break;\n  case 2: cout << "Tue"; break;\n}',
+    relatedTerms: ['case', 'break', 'if-else']
   },
   
-  "else": {
-    id: "else",
-    name: "else",
-    category: "keyword",
-    shortDefinition: "Executes code when the if condition is false.",
-    example: "if (x > 0) {\n    cout << \"positive\";\n} else {\n    cout << \"negative or zero\";\n}",
-    glossarySlug: "conditionals",
-    relatedTerms: ["if", "else-if"]
-  },
-  
-  "for": {
-    id: "for",
-    name: "for",
-    category: "keyword",
-    shortDefinition: "Loop that repeats code a specific number of times.",
-    example: "for (int i = 0; i < 5; i++) {\n    cout << i << endl;\n}",
-    glossarySlug: "loops",
-    relatedTerms: ["while", "do-while", "break", "continue"]
-  },
-  
-  "while": {
-    id: "while",
-    name: "while",
-    category: "keyword",
-    shortDefinition: "Loop that continues while condition is true. Checks condition before running.",
-    example: "int i = 0;\nwhile (i < 5) {\n    cout << i++;\n}",
-    glossarySlug: "loops",
-    relatedTerms: ["for", "do-while", "break"]
-  },
-  
-  "do": {
-    id: "do",
-    name: "do-while",
-    category: "keyword",
-    shortDefinition: "Loop that runs at least once, then checks condition. Format: do { } while(cond);",
-    example: "int i = 0;\ndo {\n    cout << i++;\n} while (i < 5);",
-    glossarySlug: "loops",
-    relatedTerms: ["while", "for", "break"]
-  },
-  
-  "switch": {
-    id: "switch",
-    name: "switch",
-    category: "keyword",
-    shortDefinition: "Multi-way branch based on value. More readable than many if-else.",
-    example: "switch (grade) {\n    case 'A': cout << \"Excellent\"; break;\n    case 'B': cout << \"Good\"; break;\n    default: cout << \"Try harder\";\n}",
-    glossarySlug: "switch",
-    relatedTerms: ["case", "break", "default", "if"]
-  },
-  
-  "break": {
-    id: "break",
-    name: "break",
-    category: "keyword",
-    shortDefinition: "Exits the current loop or switch statement immediately.",
-    example: "for (int i = 0; i < 10; i++) {\n    if (i == 5) break;\n    cout << i;\n}",
-    glossarySlug: "break",
-    relatedTerms: ["continue", "for", "while", "switch"]
-  },
-  
-  "continue": {
-    id: "continue",
-    name: "continue",
-    category: "keyword",
-    shortDefinition: "Skips the rest of current loop iteration and jumps to next iteration.",
-    example: "for (int i = 0; i < 5; i++) {\n    if (i == 2) continue;\n    cout << i; // prints 0134\n}",
-    glossarySlug: "continue",
-    relatedTerms: ["break", "for", "while"]
-  },
-  
-  "return": {
-    id: "return",
-    name: "return",
-    category: "keyword",
-    shortDefinition: "Exits a function and optionally returns a value to the caller.",
-    example: "int add(int a, int b) {\n    return a + b;\n}",
-    glossarySlug: "functions",
-    relatedTerms: ["function", "void", "type"]
-  },
-
   // Functions
-  "function": {
-    id: "function",
-    name: "function",
-    category: "concept",
-    shortDefinition: "Reusable block of code with a name, parameters, and return type.",
-    example: "int square(int x) {\n    return x * x;\n}\nint result = square(5);",
-    glossarySlug: "functions",
-    relatedTerms: ["return", "parameter", "void"]
+  'function': {
+    term: 'Function',
+    slug: 'function',
+    category: 'Functions',
+    shortDefinition: 'Reusable block of code with name, parameters, and return type.',
+    example: 'int add(int a, int b) {\n  return a + b;\n}',
+    relatedTerms: ['return', 'parameter', 'call']
+  },
+  'return': {
+    term: 'return',
+    slug: 'return',
+    category: 'Functions',
+    shortDefinition: 'Exits function and sends value back to caller.',
+    example: 'int square(int x) {\n  return x * x;\n}',
+    relatedTerms: ['function', 'void', 'value']
+  },
+  'void': {
+    term: 'void',
+    slug: 'void',
+    category: 'Functions',
+    shortDefinition: 'Means "no value". Used for functions that don\'t return anything.',
+    example: 'void printHello() {\n  cout << "Hello";\n  // no return\n}',
+    relatedTerms: ['return', 'function']
   },
   
-  "void": {
-    id: "void",
-    name: "void",
-    category: "keyword",
-    shortDefinition: "Return type meaning 'no return value'. Function doesn't return anything.",
-    example: "void greet(string name) {\n    cout << \"Hello, \" << name;\n}",
-    glossarySlug: "functions",
-    relatedTerms: ["function", "return", "int"]
+  // Data Types
+  'int': {
+    term: 'int',
+    slug: 'int',
+    category: 'Data Types',
+    shortDefinition: 'Integer type. Stores whole numbers (usually 4 bytes, range ±2 billion).',
+    example: 'int age = 25;\nint negative = -10;',
+    relatedTerms: ['long', 'short', 'unsigned']
   },
-
-  // Advanced
-  "template": {
-    id: "template",
-    name: "template",
-    category: "keyword",
-    shortDefinition: "Generic programming feature allowing functions/classes to work with any type.",
-    example: "template<typename T>\nT max(T a, T b) {\n    return (a > b) ? a : b;\n}",
-    glossarySlug: "templates",
-    relatedTerms: ["typename", "generic", "stl"]
+  'double': {
+    term: 'double',
+    slug: 'double',
+    category: 'Data Types',
+    shortDefinition: 'Floating-point type (8 bytes). For decimal numbers with ~15 digits precision.',
+    example: 'double pi = 3.14159;\ndouble price = 19.99;',
+    relatedTerms: ['float', 'decimal', 'precision']
   },
-  
-  "namespace": {
-    id: "namespace",
-    name: "namespace",
-    category: "keyword",
-    shortDefinition: "Groups code to prevent name conflicts. std is the standard namespace.",
-    example: "namespace MyLib {\n    int add(int a, int b) { return a+b; }\n}\nMyLib::add(1, 2);",
-    glossarySlug: "namespaces",
-    relatedTerms: ["using", "std", "scope"]
+  'char': {
+    term: 'char',
+    slug: 'char',
+    category: 'Data Types',
+    shortDefinition: 'Character type (1 byte). Stores single character like \'A\' or \'5\'.',
+    example: 'char letter = \'A\';\nchar digit = \'5\';',
+    relatedTerms: ['string', 'ascii', 'character']
   },
-  
-  "const": {
-    id: "const",
-    name: "const",
-    category: "keyword",
-    shortDefinition: "Makes a variable read-only. Its value cannot be changed after initialization.",
-    example: "const int MAX_SIZE = 100;\n// MAX_SIZE = 200; // ERROR!",
-    glossarySlug: "const",
-    relatedTerms: ["constexpr", "variable"]
+  'bool': {
+    term: 'bool',
+    slug: 'bool',
+    category: 'Data Types',
+    shortDefinition: 'Boolean type. Only two values: true or false.',
+    example: 'bool isValid = true;\nif (isValid) { /* ... */ }',
+    relatedTerms: ['true', 'false', 'logical']
   },
-  
-  "auto": {
-    id: "auto",
-    name: "auto",
-    category: "keyword",
-    shortDefinition: "Tells compiler to deduce the variable's type from its initializer (C++11).",
-    example: "auto x = 5; // int\nauto pi = 3.14; // double\nauto name = \"Alice\"; // const char*",
-    glossarySlug: "auto",
-    relatedTerms: ["decltype", "type"]
-  },
-
-  // STL Concepts
-  "stl": {
-    id: "stl",
-    name: "STL",
-    category: "concept",
-    shortDefinition: "Standard Template Library - collection of ready-made containers and algorithms.",
-    example: "#include <vector>\n#include <algorithm>\nvector<int> v = {3,1,2};\nsort(v.begin(), v.end());",
-    glossarySlug: "stl",
-    relatedTerms: ["vector", "map", "algorithm", "iterator"]
+  'struct': {
+    term: 'struct',
+    slug: 'struct',
+    category: 'Data Types',
+    shortDefinition: 'Groups related variables together. Like a class but members are public by default.',
+    example: 'struct Point {\n  int x, y;\n};\nPoint p = {10, 20};',
+    relatedTerms: ['class', 'data-structure']
   },
   
-  "iterator": {
-    id: "iterator",
-    name: "iterator",
-    category: "concept",
-    shortDefinition: "Object that points to elements in a container, like a smart pointer.",
-    example: "vector<int> v = {1,2,3};\nfor (auto it = v.begin(); it != v.end(); ++it) {\n    cout << *it;\n}",
-    glossarySlug: "iterators",
-    relatedTerms: ["vector", "pointer", "stl"]
+  // Keywords
+  'const': {
+    term: 'const',
+    slug: 'const',
+    category: 'Keywords',
+    shortDefinition: 'Makes a variable read-only. Cannot be modified after initialization.',
+    example: 'const int MAX = 100;\n// MAX = 200;  // ERROR!',
+    relatedTerms: ['constexpr', 'immutable', 'constant']
+  },
+  'static': {
+    term: 'static',
+    slug: 'static',
+    category: 'Keywords',
+    shortDefinition: 'Variable/function belongs to class, not objects. Shared by all instances.',
+    example: 'class Counter {\n  static int count;\n};',
+    relatedTerms: ['global', 'scope']
+  },
+  'namespace': {
+    term: 'namespace',
+    slug: 'namespace',
+    category: 'Keywords',
+    shortDefinition: 'Groups related code to avoid name conflicts. std:: is a namespace.',
+    example: 'namespace MyApp {\n  int value = 42;\n}\nMyApp::value;',
+    relatedTerms: ['std', 'using', 'scope']
+  },
+  'template': {
+    term: 'template',
+    slug: 'template',
+    category: 'Templates',
+    shortDefinition: 'Allows writing generic code that works with any type.',
+    example: 'template<typename T>\nT max(T a, T b) {\n  return (a > b) ? a : b;\n}',
+    relatedTerms: ['generic', 'typename', 'stl']
   },
   
-  "algorithm": {
-    id: "algorithm",
-    name: "algorithm",
-    category: "stl",
-    shortDefinition: "STL header with functions like sort, find, reverse. Requires #include <algorithm>.",
-    example: "#include <algorithm>\nvector<int> v = {3,1,2};\nsort(v.begin(), v.end());",
-    glossarySlug: "algorithms",
-    relatedTerms: ["stl", "iterator", "vector"]
-  },
-
   // Operators
-  "operator": {
-    id: "operator",
-    name: "operator",
-    category: "concept",
-    shortDefinition: "Symbol that performs operations on values (+, -, *, /, %, ==, !=, etc.).",
-    example: "int sum = 5 + 3;\nbool equal = (x == y);\nint mod = 10 % 3;",
-    glossarySlug: "operators",
-    relatedTerms: ["expression", "precedence"]
-  },
-
-  // Memory
-  "stack": {
-    id: "stack",
-    name: "stack",
-    category: "concept",
-    shortDefinition: "Fast memory for local variables. Automatically managed, limited size.",
-    example: "void func() {\n    int x = 5; // on stack\n} // x destroyed automatically",
-    glossarySlug: "memory",
-    relatedTerms: ["heap", "local", "scope"]
+  'operator': {
+    term: 'Operator',
+    slug: 'operator',
+    category: 'Operators',
+    shortDefinition: 'Symbol that performs operation on operands. E.g., +, -, *, /, %, ==, <, &&.',
+    example: 'int sum = 5 + 3;  // + is operator\nbool equal = (x == y);',
+    relatedTerms: ['arithmetic', 'comparison', 'logical']
   },
   
-  "heap": {
-    id: "heap",
-    name: "heap",
-    category: "concept",
-    shortDefinition: "Large memory pool for dynamic allocation with new. Must be freed with delete.",
-    example: "int* ptr = new int(42); // on heap\ndelete ptr; // must free manually",
-    glossarySlug: "memory",
-    relatedTerms: ["stack", "new", "delete", "dynamic"]
+  // Variables
+  'variable': {
+    term: 'Variable',
+    slug: 'variable',
+    category: 'Basics',
+    shortDefinition: 'Named storage location with a type. Can be changed (unless const).',
+    example: 'int age = 25;  // age is variable\nage = 26;      // can change',
+    relatedTerms: ['type', 'declaration', 'assignment']
   },
   
-  "memory-leak": {
-    id: "memory-leak",
-    name: "memory leak",
-    category: "concept",
-    shortDefinition: "Bug where allocated memory is never freed, wasting memory over time.",
-    example: "void leak() {\n    int* p = new int(5);\n    // forgot delete p!\n} // memory lost!",
-    glossarySlug: "memory-leaks",
-    relatedTerms: ["new", "delete", "heap", "smart-pointer"]
+  // Misc
+  'std': {
+    term: 'std',
+    slug: 'std',
+    category: 'STL',
+    shortDefinition: 'Standard namespace. Contains cout, cin, vector, string, and all STL.',
+    example: 'std::cout << "Hello";\nusing namespace std;  // then just: cout',
+    relatedTerms: ['namespace', 'stl', 'using']
   },
-
-  // Smart Pointers
-  "unique_ptr": {
-    id: "unique_ptr",
-    name: "unique_ptr",
-    category: "stl",
-    shortDefinition: "Smart pointer that owns and auto-deletes an object. Cannot be copied.",
-    example: "#include <memory>\nunique_ptr<int> p = make_unique<int>(42);\n// auto-deleted when p goes out of scope",
-    glossarySlug: "smart-pointers",
-    relatedTerms: ["shared_ptr", "pointer", "raii"]
+  'cout': {
+    term: 'cout',
+    slug: 'cout',
+    category: 'I/O',
+    shortDefinition: 'Console output. Use << to send data to screen.',
+    example: 'cout << "Hello" << endl;\ncout << age << " years";',
+    relatedTerms: ['cin', 'iostream', 'output']
   },
-  
-  "shared_ptr": {
-    id: "shared_ptr",
-    name: "shared_ptr",
-    category: "stl",
-    shortDefinition: "Smart pointer with reference counting. Deletes object when last copy is destroyed.",
-    example: "#include <memory>\nshared_ptr<int> p1 = make_shared<int>(42);\nshared_ptr<int> p2 = p1; // shared ownership",
-    glossarySlug: "smart-pointers",
-    relatedTerms: ["unique_ptr", "weak_ptr", "pointer"]
-  }
+  'cin': {
+    term: 'cin',
+    slug: 'cin',
+    category: 'I/O',
+    shortDefinition: 'Console input. Use >> to read user input.',
+    example: 'int age;\ncin >> age;  // user types number',
+    relatedTerms: ['cout', 'iostream', 'input']
+  },
+  'endl': {
+    term: 'endl',
+    slug: 'endl',
+    category: 'I/O',
+    shortDefinition: 'End line. Adds newline and flushes output buffer.',
+    example: 'cout << "Hello" << endl;  // moves to next line',
+    relatedTerms: ['cout', 'newline', '\\n']
+  },
 };
 
-/**
- * Get a term definition by name (case-insensitive)
- */
+// Helper to get term definition (case-insensitive)
 export function getTermDefinition(term: string): TermDefinition | undefined {
-  const normalized = term.toLowerCase().replace(/_/g, '-');
-  return termDefinitions[normalized] || termDefinitions[term];
+  const normalized = term.toLowerCase().trim();
+  return termDefinitions[normalized];
 }
 
-/**
- * Get all term names for auto-linking
- */
-export function getAllTermNames(): string[] {
-  return Object.keys(termDefinitions);
+// Get all terms for a category
+export function getTermsByCategory(category: string): TermDefinition[] {
+  return Object.values(termDefinitions).filter(t => t.category === category);
 }
 
-/**
- * Check if a word is a known C++ term
- */
-export function isCppTerm(word: string): boolean {
-  const normalized = word.toLowerCase().replace(/_/g, '-');
-  return normalized in termDefinitions || word in termDefinitions;
+// Search terms
+export function searchTerms(query: string): TermDefinition[] {
+  const q = query.toLowerCase();
+  return Object.values(termDefinitions).filter(t =>
+    t.term.toLowerCase().includes(q) ||
+    t.shortDefinition.toLowerCase().includes(q)
+  );
 }

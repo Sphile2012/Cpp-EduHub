@@ -1,27 +1,27 @@
 import { Link } from 'wouter';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Code2 } from 'lucide-react';
+import { getTermDefinition, type TermDefinition } from '@/data/term-definitions';
 
 interface ConceptLinkProps {
   term: string;
   slug?: string;
-  preview?: {
-    definition: string;
-    category: string;
-  };
   children?: React.ReactNode;
 }
 
-export function ConceptLink({ term, slug, preview, children }: ConceptLinkProps) {
+export function ConceptLink({ term, slug, children }: ConceptLinkProps) {
   const conceptSlug = slug || term.toLowerCase().replace(/\s+/g, '-');
   const displayText = children || term;
+  
+  // Get embedded definition
+  const definition = getTermDefinition(term);
 
-  if (!preview) {
+  if (!definition) {
     // Simple link without hover preview
     return (
       <Link href={`/glossary/${conceptSlug}`}>
-        <span className="text-primary underline decoration-dotted underline-offset-2 hover:decoration-solid cursor-pointer font-medium">
+        <span className="text-primary underline decoration-dotted underline-offset-2 hover:decoration-solid cursor-pointer font-medium transition-colors">
           {displayText}
         </span>
       </Link>
@@ -29,28 +29,65 @@ export function ConceptLink({ term, slug, preview, children }: ConceptLinkProps)
   }
 
   return (
-    <HoverCard openDelay={200}>
+    <HoverCard openDelay={150} closeDelay={100}>
       <HoverCardTrigger asChild>
-        <Link href={`/glossary/${conceptSlug}`}>
-          <span className="text-primary underline decoration-dotted underline-offset-2 hover:decoration-solid cursor-pointer font-medium transition-all hover:text-primary/80">
+        <Link href={`/glossary/${definition.slug}`}>
+          <span className="text-primary underline decoration-dotted underline-offset-2 hover:decoration-solid cursor-pointer font-medium transition-all hover:text-primary/80 hover:bg-primary/5 px-0.5 rounded">
             {displayText}
           </span>
         </Link>
       </HoverCardTrigger>
-      <HoverCardContent className="w-80" side="top">
-        <div className="space-y-2">
+      <HoverCardContent className="w-96 p-4" side="top" align="start">
+        <div className="space-y-3">
+          {/* Header */}
           <div className="flex items-start justify-between gap-2">
-            <h4 className="font-bold text-lg">{term}</h4>
-            <Badge variant="secondary" className="text-xs">
-              {preview.category}
+            <h4 className="font-bold text-lg text-foreground">{definition.term}</h4>
+            <Badge variant="secondary" className="text-xs whitespace-nowrap">
+              {definition.category}
             </Badge>
           </div>
+          
+          {/* Definition */}
           <p className="text-sm text-muted-foreground leading-relaxed">
-            {preview.definition}
+            {definition.shortDefinition}
           </p>
-          <div className="flex items-center gap-1 text-xs text-primary pt-2">
+          
+          {/* Code Example */}
+          {definition.example && (
+            <div className="bg-zinc-900 rounded-md p-3 border border-zinc-800">
+              <div className="flex items-center gap-1 text-xs text-zinc-500 mb-2">
+                <Code2 className="w-3 h-3" />
+                <span>Example:</span>
+              </div>
+              <pre className="text-xs text-green-400 font-mono overflow-x-auto">
+                {definition.example}
+              </pre>
+            </div>
+          )}
+          
+          {/* Related Terms */}
+          {definition.relatedTerms && definition.relatedTerms.length > 0 && (
+            <div className="pt-2 border-t border-border">
+              <div className="text-xs text-muted-foreground mb-2">Related:</div>
+              <div className="flex flex-wrap gap-1">
+                {definition.relatedTerms.slice(0, 4).map(related => (
+                  <Link key={related} href={`/glossary/${related}`}>
+                    <Badge 
+                      variant="outline" 
+                      className="text-xs cursor-pointer hover:bg-primary/10 transition-colors"
+                    >
+                      {related}
+                    </Badge>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Learn More */}
+          <div className="flex items-center gap-1 text-xs text-primary pt-2 border-t border-border font-medium">
             <BookOpen className="w-3 h-3" />
-            <span>Click to learn more</span>
+            <span>Click to learn more in glossary →</span>
           </div>
         </div>
       </HoverCardContent>
@@ -58,60 +95,55 @@ export function ConceptLink({ term, slug, preview, children }: ConceptLinkProps)
   );
 }
 
-// Helper function to automatically linkify C++ keywords in text
-// This version returns HTML string for use with dangerouslySetInnerHTML
+// Helper function to automatically linkify C++ keywords in HTML text
 export function linkifyContent(htmlText: string): string {
-  // Common C++ keywords and concepts to linkify
-  const concepts = [
-    { term: 'pointer', category: 'Memory' },
-    { term: 'pointers', category: 'Memory' },
-    { term: 'reference', category: 'Memory' },
-    { term: 'references', category: 'Memory' },
-    { term: 'class', category: 'OOP' },
-    { term: 'classes', category: 'OOP' },
-    { term: 'object', category: 'OOP' },
-    { term: 'objects', category: 'OOP' },
-    { term: 'constructor', category: 'OOP' },
-    { term: 'destructor', category: 'OOP' },
-    { term: 'inheritance', category: 'OOP' },
-    { term: 'polymorphism', category: 'OOP' },
-    { term: 'encapsulation', category: 'OOP' },
-    { term: 'abstraction', category: 'OOP' },
-    { term: 'function', category: 'Functions' },
-    { term: 'functions', category: 'Functions' },
-    { term: 'array', category: 'Data Structures' },
-    { term: 'arrays', category: 'Data Structures' },
-    { term: 'vector', category: 'STL' },
-    { term: 'vectors', category: 'STL' },
-    { term: 'loop', category: 'Control Flow' },
-    { term: 'loops', category: 'Control Flow' },
-    { term: 'variable', category: 'Basics' },
-    { term: 'variables', category: 'Basics' },
-    { term: 'operator', category: 'Basics' },
-    { term: 'operators', category: 'Basics' },
-    { term: 'template', category: 'Templates' },
-    { term: 'templates', category: 'Templates' },
-    { term: 'namespace', category: 'Basics' },
-    { term: 'const', category: 'Keywords' },
-    { term: 'static', category: 'Keywords' },
-    { term: 'virtual', category: 'OOP' },
-    { term: 'override', category: 'OOP' },
-    { term: 'struct', category: 'Data Types' },
-    { term: 'enum', category: 'Data Types' },
-  ];
+  // C++ keywords to linkify (sorted by length, longest first to avoid partial matches)
+  const keywords = [
+    'polymorphism', 'encapsulation', 'inheritance', 'constructor', 'destructor',
+    'pointers', 'pointer', 'references', 'reference', 'namespace', 'template',
+    'templates', 'operator', 'operators', 'variable', 'variables', 'function',
+    'functions', 'nullptr', 'virtual', 'override', 'classes', 'class', 'objects',
+    'object', 'vectors', 'vector', 'arrays', 'array', 'string', 'struct',
+    'const', 'static', 'double', 'float', 'char', 'bool', 'void', 'endl',
+    'cout', 'cin', 'std', 'for', 'while', 'switch', 'return', 'loop', 'loops',
+    'map', 'set', 'int', 'new', 'delete', 'if'
+  ].sort((a, b) => b.length - a.length);
 
-  // Sort by length (longest first) to avoid partial matches
-  const sortedConcepts = [...concepts].sort((a, b) => b.term.length - a.term.length);
-  
   let result = htmlText;
   
-  sortedConcepts.forEach((concept) => {
-    // Match whole words only, case-insensitive, but not inside HTML tags
-    const regex = new RegExp(`\\b(${concept.term})\\b(?![^<]*>)`, 'gi');
+  // Track which positions we've already linkified to avoid nested links
+  const linkifiedRanges: Array<{start: number, end: number}> = [];
+  
+  keywords.forEach((keyword) => {
+    // Match whole words only, case-insensitive, not inside HTML tags or existing links
+    const regex = new RegExp(`\\b(${keyword})\\b(?![^<]*>)(?![^<]*<\\/a>)`, 'gi');
+    let match;
     
-    result = result.replace(regex, (match) => {
-      const slug = concept.term.toLowerCase();
-      return `<a href="/glossary/${slug}" class="text-primary underline decoration-dotted underline-offset-2 hover:decoration-solid font-medium transition-colors" data-concept="${concept.term}" data-category="${concept.category}">${match}</a>`;
+    // Find all matches first
+    const matches: Array<{index: number, match: string}> = [];
+    while ((match = regex.exec(result)) !== null) {
+      matches.push({ index: match.index, match: match[0] });
+    }
+    
+    // Apply replacements in reverse order to maintain indices
+    matches.reverse().forEach(({ index, match }) => {
+      // Check if this position is already linkified
+      const alreadyLinkified = linkifiedRanges.some(
+        range => index >= range.start && index <= range.end
+      );
+      
+      if (!alreadyLinkified) {
+        const slug = keyword.toLowerCase().replace(/\s+/g, '-');
+        const replacement = `<a href="/glossary/${slug}" class="text-primary underline decoration-dotted underline-offset-2 hover:decoration-solid font-medium transition-colors hover:bg-primary/5 px-0.5 rounded" data-concept="${keyword}">${match}</a>`;
+        
+        result = result.substring(0, index) + replacement + result.substring(index + match.length);
+        
+        // Mark this range as linkified
+        linkifiedRanges.push({
+          start: index,
+          end: index + replacement.length
+        });
+      }
     });
   });
 

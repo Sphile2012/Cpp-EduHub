@@ -21,7 +21,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground selection:bg-primary/30">
-      <Sidebar className="hidden md:flex sticky top-0 h-screen" />
+      {/* Sidebar hidden - using hamburger menu for all screen sizes */}
       <div className="flex-1 w-full max-w-full min-w-0 overflow-x-hidden">
         <MobileHeader />
         <main>

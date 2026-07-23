@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { useRunCode, CodeRunResult } from "@workspace/api-client-react";
-import { Terminal, Play, Loader2, Maximize2, Minimize2, AlertCircle, Save, Trash2, Download } from "lucide-react";
+import { CodeRunResult } from "@workspace/api-client-react";
+import { Terminal, Play, Maximize2, Minimize2, AlertCircle, Save, Trash2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Editor from '@monaco-editor/react';
 
@@ -15,7 +15,6 @@ export function PlaygroundPanel({ initialCode = "" }: PlaygroundPanelProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditorReady, setIsEditorReady] = useState(false);
   
-  const runCodeMutation = useRunCode();
   const editorRef = useRef<any>(null);
 
   // Update code when initialCode prop changes
@@ -36,8 +35,36 @@ export function PlaygroundPanel({ initialCode = "" }: PlaygroundPanelProps) {
   };
 
   const handleRun = () => {
-    runCodeMutation.mutate({ data: { code, stdin: stdin || undefined } }, {
-      onSuccess: (data) => setOutput(data)
+    // Since we're running without a backend, show a simulated output with a helpful message
+    setOutput({
+      stdout: `⚠️ Code Execution Note:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+This playground is currently running in offline mode without a C++ compiler backend.
+
+To run your C++ code, you have these options:
+
+1. 📋 Copy your code and use an online compiler:
+   • https://compiler-explorer.com/
+   • https://www.onlinegdb.com/online_c++_compiler
+   • https://replit.com/languages/cpp
+
+2. 💻 Run locally on your machine:
+   • Install g++ or clang++
+   • Save as .cpp file and compile: g++ filename.cpp -o output
+   • Run: ./output (Linux/Mac) or output.exe (Windows)
+
+3. 🔧 Set up the backend:
+   • See documentation for instructions on running the API server
+   • The server provides real-time compilation and execution
+
+Your code is ready to copy! Just use the Download button above.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`,
+      stderr: '',
+      exitCode: 0,
+      executionTime: 0
     });
   };
 
@@ -118,11 +145,10 @@ export function PlaygroundPanel({ initialCode = "" }: PlaygroundPanelProps) {
             {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </Button>
           <Button 
-            onClick={handleRun} 
-            disabled={runCodeMutation.isPending}
+            onClick={handleRun}
             className="h-8 bg-amber-600 hover:bg-amber-500 text-white font-mono text-xs gap-1 border-none shadow-none"
           >
-            {runCodeMutation.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3 fill-current" />}
+            <Play className="w-3 h-3 fill-current" />
             RUN (Cmd+Enter)
           </Button>
         </div>
@@ -181,12 +207,8 @@ export function PlaygroundPanel({ initialCode = "" }: PlaygroundPanelProps) {
           {output?.executionTime && <span>{output.executionTime}ms</span>}
         </div>
         <div className="flex-1 p-4 overflow-auto font-mono text-sm whitespace-pre-wrap">
-          {runCodeMutation.isPending ? (
-            <div className="text-zinc-500 flex items-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin" /> Compiling & Executing...
-            </div>
-          ) : !output ? (
-            <div className="text-zinc-600 italic">Output will appear here...</div>
+          {!output ? (
+            <div className="text-zinc-600 italic">Click RUN to see output instructions...</div>
           ) : (
             <>
               {output.compilationError && (
@@ -195,10 +217,10 @@ export function PlaygroundPanel({ initialCode = "" }: PlaygroundPanelProps) {
                   <span>{output.compilationError}</span>
                 </div>
               )}
-              {output.stdout && <div className="text-green-400">{output.stdout}</div>}
+              {output.stdout && <div className="text-amber-300">{output.stdout}</div>}
               {output.stderr && <div className="text-red-400">{output.stderr}</div>}
-              {output.exitCode !== undefined && (
-                <div className={`mt-4 text-xs ${output.exitCode === 0 ? 'text-zinc-500' : 'text-amber-500'}`}>
+              {output.exitCode !== undefined && output.exitCode !== 0 && (
+                <div className="mt-4 text-xs text-amber-500">
                   Process finished with exit code {output.exitCode}
                 </div>
               )}

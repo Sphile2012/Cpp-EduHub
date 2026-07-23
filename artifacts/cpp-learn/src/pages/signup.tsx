@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { Link } from 'wouter';
 import { motion } from 'framer-motion';
-import { UserPlus, Mail, Lock, User, Eye, EyeOff, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, Eye, EyeOff, ArrowLeft, CheckCircle2, Chrome } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,7 +14,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function SignupPage() {
-  const { signup, error, clearError } = useAuth();
+  const { signup, loginWithGoogle, error, clearError } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -69,6 +69,18 @@ export default function SignupPage() {
   };
 
   const displayError = localError || error;
+
+  const handleGoogleSignup = async () => {
+    setIsLoading(true);
+    clearError();
+    setLocalError(null);
+    
+    const success = await loginWithGoogle();
+    
+    if (!success) {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
@@ -189,6 +201,26 @@ export default function SignupPage() {
                 disabled={isLoading}
               >
                 {isLoading ? 'Creating Account...' : 'Create Account'}
+              </Button>
+              
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-white/20" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-[#1a1a2e] px-2 text-gray-400">Or continue with</span>
+                </div>
+              </div>
+              
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleGoogleSignup}
+                disabled={isLoading}
+                className="w-full bg-white/5 border-white/20 text-white hover:bg-white/10"
+              >
+                <Chrome className="mr-2 h-4 w-4" />
+                {isLoading ? 'Creating Account...' : 'Sign up with Google'}
               </Button>
               
               <div className="text-center text-sm text-gray-400">

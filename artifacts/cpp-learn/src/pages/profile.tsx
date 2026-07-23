@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { User, Mail, Edit2, Save, X, Trophy, Flame, BookOpen, CheckCircle2, Settings, LogOut } from 'lucide-react';
+import { User, Mail, Edit2, Save, X, Trophy, Flame, BookOpen, CheckCircle2, Settings, LogOut, Chrome, Link as LinkIcon } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useLanguage } from '@/hooks/use-language';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 
 export default function ProfilePage() {
-  const { user, updateProfile, logout } = useAuth();
+  const { user, updateProfile, logout, loginWithGoogle } = useAuth();
   const { languageConfig } = useLanguage();
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(user?.name || '');
@@ -45,6 +45,15 @@ export default function ProfilePage() {
     setEditName(user.name);
     setEditBio(user.bio || '');
     setIsEditing(false);
+  };
+
+  const handleConnectGoogle = async () => {
+    // In a real app, this would link the Google account to the existing user
+    // For demo purposes, we'll just show a toast
+    const success = await loginWithGoogle();
+    if (success) {
+      // User is now logged in with Google
+    }
   };
 
   const stats = [
@@ -234,6 +243,43 @@ export default function ProfilePage() {
                     </Button>
                   ))}
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Connected Accounts</CardTitle>
+              <CardDescription>Link your accounts for easier sign-in.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-blue-500/10">
+                    <Chrome className="w-5 h-5 text-blue-500" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Google</p>
+                    <p className="text-sm text-muted-foreground">
+                      {user.email?.endsWith('@gmail.com') ? 'Connected' : 'Not connected'}
+                    </p>
+                  </div>
+                </div>
+                {!user.email?.endsWith('@gmail.com') && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleConnectGoogle}
+                  >
+                    <LinkIcon className="w-4 h-4 mr-2" />
+                    Connect
+                  </Button>
+                )}
+                {user.email?.endsWith('@gmail.com') && (
+                  <Badge variant="secondary" className="bg-green-500/10 text-green-600">
+                    Connected
+                  </Badge>
+                )}
               </div>
             </CardContent>
           </Card>

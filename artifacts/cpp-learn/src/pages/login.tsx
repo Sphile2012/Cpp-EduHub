@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { Link } from 'wouter';
 import { motion } from 'framer-motion';
-import { LogIn, Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { LogIn, Mail, Lock, Eye, EyeOff, ArrowLeft, Chrome } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,7 +14,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function LoginPage() {
-  const { login, error, clearError } = useAuth();
+  const { login, loginWithGoogle, error, clearError } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -31,6 +31,17 @@ export default function LoginPage() {
       setIsLoading(false);
     }
     // If success, the user will be redirected by the auth flow
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    clearError();
+    
+    const success = await loginWithGoogle();
+    
+    if (!success) {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -112,6 +123,26 @@ export default function LoginPage() {
                 disabled={isLoading}
               >
                 {isLoading ? 'Signing in...' : 'Sign In'}
+              </Button>
+              
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-white/20" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-[#1a1a2e] px-2 text-gray-400">Or continue with</span>
+                </div>
+              </div>
+              
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleGoogleLogin}
+                disabled={isLoading}
+                className="w-full bg-white/5 border-white/20 text-white hover:bg-white/10"
+              >
+                <Chrome className="mr-2 h-4 w-4" />
+                {isLoading ? 'Signing in...' : 'Sign in with Google'}
               </Button>
               
               <div className="text-center text-sm text-gray-400">

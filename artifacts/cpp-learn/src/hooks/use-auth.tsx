@@ -33,6 +33,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   signup: (email: string, password: string, name: string) => Promise<boolean>;
+  loginWithGoogle: () => Promise<boolean>;
   logout: () => void;
   updateProfile: (updates: Partial<UserProfile>) => Promise<boolean>;
   error: string | null;
@@ -45,6 +46,7 @@ const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   login: async () => false,
   signup: async () => false,
+  loginWithGoogle: async () => false,
   logout: () => {},
   updateProfile: async () => false,
   error: null,
@@ -78,6 +80,56 @@ export function useAuthProvider() {
     };
     loadUser();
   }, []);
+
+  const loginWithGoogle = useCallback(async (): Promise<boolean> => {
+    try {
+      setError(null);
+      
+      // Simulate Google OAuth flow
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // In production, this would trigger the Google OAuth popup
+      // For demo purposes, create a mock Google user
+      const mockUser: UserProfile = {
+        id: `google-user-${Date.now()}`,
+        email: `user@gmail.com`,
+        name: 'Google User',
+        avatar: 'https://ui-avatars.com/api/?name=Google+User&background=4285F4&color=fff',
+        joinDate: new Date().toISOString(),
+        preferences: {
+          theme: 'system',
+          notifications: true,
+        },
+        stats: {
+          totalXp: 100,
+          level: 1,
+          streak: 0,
+          completedLessons: 0,
+          passedQuizzes: 0,
+        },
+      };
+
+      setUser(mockUser);
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(mockUser));
+      localStorage.setItem(STORAGE_KEYS.TOKEN, `google-token-${Date.now()}`);
+      
+      toast({
+        title: 'Welcome to uPhumeh!',
+        description: `Signed in with Google as ${mockUser.name}`,
+      });
+      
+      return true;
+    } catch (e) {
+      const errorMessage = 'Google sign-in failed. Please try again.';
+      setError(errorMessage);
+      toast({
+        title: 'Google sign-in failed',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+      return false;
+    }
+  }, [toast]);
 
   const login = useCallback(async (email: string, password: string): Promise<boolean> => {
     try {
@@ -249,31 +301,33 @@ export function useAuthProvider() {
     setError(null);
   }, []);
 
-  return {
-    user,
-    isLoading,
-    isAuthenticated: !!user,
-    login,
-    signup,
-    logout,
-    updateProfile,
-    error,
-    clearError,
-  };
+    return {
+      user,
+      isLoading,
+      isAuthenticated: !!user,
+      login,
+      loginWithGoogle,
+      signup,
+      logout,
+      updateProfile,
+      error,
+      clearError,
+    };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const {
-    user,
-    isLoading,
-    isAuthenticated,
-    login,
-    signup,
-    logout,
-    updateProfile,
-    error,
-    clearError,
-  } = useAuthProvider();
+    const {
+      user,
+      isLoading,
+      isAuthenticated,
+      login,
+      loginWithGoogle,
+      signup,
+      logout,
+      updateProfile,
+      error,
+      clearError,
+    } = useAuthProvider();
 
   if (isLoading) {
     return (
@@ -290,6 +344,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         isAuthenticated,
         login,
+        loginWithGoogle,
         signup,
         logout,
         updateProfile,

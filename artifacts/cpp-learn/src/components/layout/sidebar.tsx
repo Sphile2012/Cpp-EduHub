@@ -11,20 +11,32 @@ import {
   FileQuestion,
   User,
   LogIn,
-  LogOut
+  LogOut,
+  Languages,
+  ChevronDown,
+  Check
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocalProgress } from "@/hooks/use-local-progress";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { LANGUAGES, LANGUAGE_ORDER } from "@/config/languages";
 
 export function Sidebar({ className }: { className?: string }) {
   const [location, setLocation] = useLocation();
   const { getMergedProgress } = useLocalProgress();
   const { user, isAuthenticated, logout } = useAuth();
+  const { currentLanguage, setLanguage } = useLanguage();
   const progress = getMergedProgress();
 
   const navItems = [
@@ -108,6 +120,53 @@ export function Sidebar({ className }: { className?: string }) {
           </div>
         </div>
       )}
+
+      <Separator className="mx-4 mb-4" />
+
+      {/* Language Switcher */}
+      <div className="px-4 mb-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-full justify-between gap-2 bg-background/50 hover:bg-accent/10"
+            >
+              <div className="flex items-center gap-2">
+                <Languages className="w-4 h-4" />
+                <span className="text-sm font-medium">
+                  {LANGUAGES[currentLanguage].icon} {LANGUAGES[currentLanguage].displayName}
+                </span>
+              </div>
+              <ChevronDown className="w-4 h-4 opacity-50" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56">
+            {LANGUAGE_ORDER.map((langId) => {
+              const lang = LANGUAGES[langId];
+              return (
+                <DropdownMenuItem
+                  key={langId}
+                  onClick={() => setLanguage(langId)}
+                  className="cursor-pointer"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{lang.icon}</span>
+                      <div>
+                        <div className="font-medium text-sm">{lang.displayName}</div>
+                        <div className="text-xs text-muted-foreground capitalize">{lang.difficulty}</div>
+                      </div>
+                    </div>
+                    {currentLanguage === langId && (
+                      <Check className="w-4 h-4 text-primary" />
+                    )}
+                  </div>
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
       <Separator className="mx-4 mb-4" />
 

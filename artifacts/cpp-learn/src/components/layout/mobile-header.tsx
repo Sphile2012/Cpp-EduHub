@@ -15,18 +15,30 @@ import {
   User,
   LogIn,
   UserPlus,
-  LogOut
+  LogOut,
+  Languages,
+  ChevronDown,
+  Check
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { LANGUAGES, LANGUAGE_ORDER } from "@/config/languages";
 
 export function MobileHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const [location, setLocation] = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
+  const { currentLanguage, setLanguage } = useLanguage();
 
   const navItems = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -156,6 +168,56 @@ export function MobileHeader() {
               </Link>
             </div>
           )}
+
+          <Separator className="my-2" />
+
+          {/* Language Switcher */}
+          <div className="mb-3">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-between gap-2 bg-background/50 hover:bg-accent/10"
+                >
+                  <div className="flex items-center gap-2">
+                    <Languages className="w-4 h-4" />
+                    <span className="text-sm font-medium">
+                      {LANGUAGES[currentLanguage].icon} {LANGUAGES[currentLanguage].displayName}
+                    </span>
+                  </div>
+                  <ChevronDown className="w-4 h-4 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-64">
+                {LANGUAGE_ORDER.map((langId) => {
+                  const lang = LANGUAGES[langId];
+                  return (
+                    <DropdownMenuItem
+                      key={langId}
+                      onClick={() => {
+                        setLanguage(langId);
+                        setIsOpen(false);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">{lang.icon}</span>
+                          <div>
+                            <div className="font-medium">{lang.displayName}</div>
+                            <div className="text-xs text-muted-foreground">{lang.difficulty}</div>
+                          </div>
+                        </div>
+                        {currentLanguage === langId && (
+                          <Check className="w-4 h-4 text-primary" />
+                        )}
+                      </div>
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
           <Separator className="my-2" />
 

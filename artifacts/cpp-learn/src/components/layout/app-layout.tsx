@@ -1,4 +1,5 @@
 import { Sidebar } from "./sidebar";
+import { MobileHeader } from "./mobile-header";
 import { ReactNode, useEffect } from "react";
 import { useLocalProgress } from "@/hooks/use-local-progress";
 
@@ -21,9 +22,12 @@ export function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen bg-background text-foreground selection:bg-primary/30">
       <Sidebar className="hidden md:flex sticky top-0 h-screen" />
-      <main className="flex-1 w-full max-w-full min-w-0 overflow-x-hidden">
-        {children}
-      </main>
+      <div className="flex-1 w-full max-w-full min-w-0 overflow-x-hidden">
+        <MobileHeader />
+        <main>
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

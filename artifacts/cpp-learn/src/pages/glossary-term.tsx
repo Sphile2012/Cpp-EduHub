@@ -7,9 +7,19 @@ import { Badge } from "@/components/ui/badge";
 export default function GlossaryTerm() {
   const { slug } = useParams<{ slug: string }>();
   const slugValue = slug || "";
-  const { data: term, isLoading } = useGetGlossaryTerm(slugValue);
+  const { data: term } = useGetGlossaryTerm(slugValue);
 
-  if (isLoading || !term) return <div className="p-8 text-center animate-pulse">Loading term...</div>;
+  if (!term) {
+    return (
+      <div className="p-8 text-center">
+        <h1 className="text-2xl font-bold mb-4">Term Not Found</h1>
+        <p className="text-muted-foreground mb-6">The glossary term "{slugValue}" could not be found.</p>
+        <Link href="/glossary" className="text-primary hover:underline">
+          ← Back to Glossary
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-8 space-y-10">

@@ -7,7 +7,8 @@ import {
   Layers,
   LayoutDashboard,
   Bot,
-  Sparkles
+  Sparkles,
+  FileQuestion
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocalProgress } from "@/hooks/use-local-progress";
@@ -21,6 +22,7 @@ export function Sidebar({ className }: { className?: string }) {
   const navItems = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
     { href: "/lessons", label: "Lessons", icon: BookOpen },
+    { href: "/quiz/basics", label: "Quiz", icon: FileQuestion },
     { href: "/playground", label: "Playground", icon: TerminalSquare },
     { href: "/learning-hub", label: "Learning Hub", icon: Sparkles },
     { href: "/ai-tutor", label: "AI Tutor", icon: Bot },

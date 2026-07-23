@@ -37,9 +37,11 @@ export function PlaygroundPanel({ initialCode = "" }: PlaygroundPanelProps) {
 
   const handleRun = async () => {
     setIsRunning(true);
-    setOutput({ stdout: "⏳ Compiling and running...", stderr: "", exitCode: 0, executionTime: 0 });
+    setOutput({ stdout: "⏳ Compiling and running with Piston API...", stderr: "", exitCode: 0, executionTime: 0 });
     
     try {
+      console.log('🚀 Sending code to Piston API...');
+      
       // Using Piston API (https://github.com/engineer-man/piston) - Free, no CORS issues
       const response = await fetch('https://emkc.org/api/v2/piston/execute', {
         method: 'POST',
@@ -57,7 +59,9 @@ export function PlaygroundPanel({ initialCode = "" }: PlaygroundPanelProps) {
         }),
       });
 
+      console.log('📦 Response received:', response.status);
       const result = await response.json();
+      console.log('✅ Result:', result);
       
       if (result.compile) {
         // Compilation output exists
@@ -78,9 +82,10 @@ export function PlaygroundPanel({ initialCode = "" }: PlaygroundPanelProps) {
         });
       }
     } catch (error) {
+      console.error('❌ Error:', error);
       setOutput({
         stdout: '',
-        stderr: `❌ Connection Error: ${error instanceof Error ? error.message : 'Unknown error'}\n\nFallback options:\n1. Use https://compiler-explorer.com/\n2. Use https://www.onlinegdb.com/online_c++_compiler\n3. Install g++ locally and compile`,
+        stderr: `❌ Connection Error: ${error instanceof Error ? error.message : 'Unknown error'}\n\nPlease check:\n1. Your internet connection\n2. Browser console for details\n\nFallback options:\n1. Use https://compiler-explorer.com/\n2. Use https://www.onlinegdb.com/online_c++_compiler\n3. Install g++ locally and compile`,
         exitCode: 1,
         executionTime: 0
       });

@@ -36,6 +36,7 @@ export default defineConfig({
         orientation: 'portrait-primary',
         scope: '/',
         start_url: '/',
+        version: '1.1.0',
         icons: [
           {
             src: '/pwa-192x192.svg',

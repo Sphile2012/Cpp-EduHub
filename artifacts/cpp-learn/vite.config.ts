@@ -2,8 +2,7 @@ import path from 'path';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
-
-import runtimeErrorOverlay from '@replit/vite-plugin-runtime-error-modal';
+import { VitePWA } from 'vite-plugin-pwa';
 
 const rawPort = process.env.PORT;
 
@@ -32,20 +31,84 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    runtimeErrorOverlay(),
-    ...(process.env.NODE_ENV !== 'production' &&
-    process.env.REPL_ID !== undefined
-      ? [
-          await import('@replit/vite-plugin-cartographer').then((m) =>
-            m.cartographer({
-              root: path.resolve(import.meta.dirname, '..'),
-            }),
-          ),
-          await import('@replit/vite-plugin-dev-banner').then((m) =>
-            m.devBanner(),
-          ),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.svg', 'robots.txt'],
+      manifest: {
+        name: 'Master C++ with uPhumeh',
+        short_name: 'C++ EduHub',
+        description: 'Learn C++ programming for free with interactive lessons, quizzes, and hands-on coding practice',
+        theme_color: '#f59e0b',
+        background_color: '#1a1412',
+        display: 'standalone',
+        orientation: 'portrait-primary',
+        scope: '/',
+        start_url: '/',
+        icons: [
+          {
+            src: '/pwa-192x192.svg',
+            sizes: '192x192',
+            type: 'image/svg+xml',
+            purpose: 'any'
+          },
+          {
+            src: '/pwa-512x512.svg',
+            sizes: '512x512',
+            type: 'image/svg+xml',
+            purpose: 'any'
+          },
+          {
+            src: '/pwa-maskable-192x192.svg',
+            sizes: '192x192',
+            type: 'image/svg+xml',
+            purpose: 'maskable'
+          },
+          {
+            src: '/pwa-maskable-512x512.svg',
+            sizes: '512x512',
+            type: 'image/svg+xml',
+            purpose: 'maskable'
+          }
+        ],
+        categories: ['education', 'developer tools'],
+        shortcuts: [
+          {
+            name: 'Lessons',
+            short_name: 'Lessons',
+            description: 'Browse C++ lessons',
+            url: '/lessons',
+            icons: [{ src: '/favicon.svg', sizes: '96x96' }]
+          },
+          {
+            name: 'Playground',
+            short_name: 'Playground',
+            description: 'Code playground',
+            url: '/playground',
+            icons: [{ src: '/favicon.svg', sizes: '96x96' }]
+          }
         ]
-      : []),
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/images\.unsplash\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'unsplash-images',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
+              }
+            }
+          }
+        ]
+      },
+      devOptions: {
+        enabled: true,
+        type: 'module'
+      }
+    })
   ],
   resolve: {
     alias: {

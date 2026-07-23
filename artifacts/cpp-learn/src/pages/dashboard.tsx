@@ -1,7 +1,7 @@
 import { useGetLessons, useGetProgress } from "@workspace/api-client-react";
 import { useLocalProgress } from "@/hooks/use-local-progress";
 import { Link } from "wouter";
-import { BookOpen, Target, CheckCircle2, Flame, Trophy, Activity, ArrowRight, Play, Award, Layers, TerminalSquare } from "lucide-react";
+import { BookOpen, Target, CheckCircle2, Flame, Trophy, Activity, ArrowRight, Play, Award, Layers, TerminalSquare, Sparkles } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -19,56 +19,128 @@ export default function Dashboard() {
   const nextLesson = lessons?.find(l => !completedLessonIds.includes(l.id)) || lessons?.[0];
 
   return (
-    <div className="p-8 max-w-6xl mx-auto space-y-8">
-      {/* Hero Section */}
+    <div className="space-y-8">
+      {/* Video Hero Section */}
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col md:flex-row gap-8 items-start md:items-center justify-between bg-card border rounded-2xl p-8 shadow-sm relative overflow-hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="relative h-[70vh] min-h-[500px] w-full overflow-hidden"
       >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
-        
-        <div className="space-y-4 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium border border-primary/20">
-            <Flame className="w-4 h-4" /> {progress.streak} Day Streak
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold font-handwriting tracking-tight text-foreground">
-            Welcome back to the workshop.
-          </h1>
-          <p className="text-muted-foreground text-lg max-w-xl">
-            You're making solid progress. Ready to tackle {nextLesson?.title || "your next challenge"}?
-          </p>
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img 
+            src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=2069&auto=format&fit=crop"
+            alt="Coding background"
+            className="w-full h-full object-cover"
+            loading="eager"
+          />
           
-          {nextLesson && (
-            <div className="pt-4">
-              <Link href={`/lessons/${nextLesson.id}`} className="inline-flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 rounded-lg font-medium transition-colors shadow-sm active-elevate">
-                <Play className="w-4 h-4 fill-current" />
-                Continue Learning
-              </Link>
-            </div>
-          )}
+          {/* Dark overlay for readability */}
+          <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/70" />
+          
+          {/* Animated gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 via-purple-900/30 to-pink-900/30 animate-gradient-shift" />
+          
+          {/* Dot pattern overlay */}
+          <div className="absolute inset-0 opacity-20" style={{
+            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)',
+            backgroundSize: '50px 50px'
+          }} />
         </div>
 
-        <div className="relative z-10 flex-shrink-0 flex flex-col items-center justify-center p-6 bg-background rounded-xl border shadow-sm min-w-[200px]">
-          <div className="relative w-32 h-32 flex items-center justify-center mb-4">
-            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" className="text-muted/30" strokeWidth="8" />
-              <circle 
-                cx="50" cy="50" r="45" fill="none" stroke="currentColor" 
-                className="text-primary" strokeWidth="8"
-                strokeDasharray={`${2 * Math.PI * 45}`}
-                strokeDashoffset={`${2 * Math.PI * 45 * (1 - (progress.completedLessons / progress.totalLessons))}`}
-                strokeLinecap="round"
-              />
-            </svg>
-            <div className="absolute flex flex-col items-center justify-center">
-              <span className="text-3xl font-bold font-mono">{progress.completedLessons}</span>
-              <span className="text-xs text-muted-foreground uppercase tracking-wider font-mono">/ {progress.totalLessons}</span>
-            </div>
+        {/* Content Overlay */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center space-y-6 px-4 z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-4 drop-shadow-2xl font-handwriting">
+                Master C++ with <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">uPhumeh</span>
+              </h1>
+            </motion.div>
+            
+            <motion.p 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="text-xl md:text-2xl text-gray-200 max-w-2xl mx-auto drop-shadow-lg"
+            >
+              Your journey to becoming a C++ expert starts here. Learn, practice, and master programming for free.
+            </motion.p>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center pt-4"
+            >
+              {nextLesson && (
+                <Link href={`/lessons/${nextLesson.id}`}>
+                  <button className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all shadow-lg hover:shadow-xl hover:scale-105 active-elevate">
+                    <Play className="w-5 h-5 fill-current" />
+                    {progress.completedLessons > 0 ? 'Continue Learning' : 'Start Learning'}
+                  </button>
+                </Link>
+              )}
+              
+              <Link href="/playground">
+                <button className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white border-2 border-white/30 px-8 py-4 rounded-lg font-semibold text-lg transition-all shadow-lg hover:shadow-xl hover:scale-105">
+                  <TerminalSquare className="w-5 h-5" />
+                  Try Playground
+                </button>
+              </Link>
+            </motion.div>
+
+            {/* Progress Indicator */}
+            {progress.completedLessons > 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8 }}
+                className="pt-8"
+              >
+                <div className="inline-flex items-center gap-3 bg-black/40 backdrop-blur-md px-6 py-3 rounded-full border border-white/20">
+                  <div className="flex items-center gap-2">
+                    <Flame className="w-5 h-5 text-orange-400" />
+                    <span className="text-white font-semibold">{progress.streak} day streak</span>
+                  </div>
+                  <div className="w-px h-6 bg-white/20" />
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-400" />
+                    <span className="text-white font-semibold">{progress.completedLessons}/{progress.totalLessons} lessons</span>
+                  </div>
+                  <div className="w-px h-6 bg-white/20" />
+                  <div className="flex items-center gap-2">
+                    <Trophy className="w-5 h-5 text-yellow-400" />
+                    <span className="text-white font-semibold">Level {progress.level}</span>
+                  </div>
+                </div>
+              </motion.div>
+            )}
           </div>
-          <p className="text-sm font-medium text-muted-foreground">Lessons Completed</p>
         </div>
+
+        {/* Scroll indicator */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1, repeat: Infinity, duration: 1.5 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        >
+          <div className="w-6 h-10 border-2 border-white/50 rounded-full p-1">
+            <motion.div 
+              animate={{ y: [0, 12, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+              className="w-1.5 h-1.5 bg-white rounded-full mx-auto"
+            />
+          </div>
+        </motion.div>
       </motion.div>
+
+      {/* Main Content Section */}
+      <div className="p-8 max-w-6xl mx-auto space-y-8">
 
       {/* Quick Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -177,6 +249,20 @@ export default function Dashboard() {
               </Card>
             </Link>
             
+            <Link href="/learning-hub">
+              <Card className="hover:border-primary transition-all hover:-translate-y-1 hover:shadow-md cursor-pointer group">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <div className="p-2 bg-primary/10 rounded-md text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                      <Sparkles className="w-5 h-5" />
+                    </div>
+                    Learning Hub
+                  </CardTitle>
+                  <CardDescription>Explore concepts, challenges, errors, and progress in one place.</CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+
             <Link href="/glossary">
               <Card className="hover:border-primary transition-all hover:-translate-y-1 hover:shadow-md cursor-pointer group">
                 <CardHeader>
@@ -192,6 +278,7 @@ export default function Dashboard() {
             </Link>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

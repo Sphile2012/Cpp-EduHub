@@ -40,31 +40,43 @@ export function PlaygroundPanel({ initialCode = "" }: PlaygroundPanelProps) {
     setOutput({ stdout: "⏳ Compiling and running...", stderr: "", exitCode: 0, executionTime: 0 });
     
     try {
-      // Using JDoodle API for C++ compilation
-      const response = await fetch('https://api.jdoodle.com/v1/execute', {
+      // Using Piston API (https://github.com/engineer-man/piston) - Free, no CORS issues
+      const response = await fetch('https://emkc.org/api/v2/piston/execute', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          clientId: '2e6f61b04b2bb1f4a7208c0b5d2e2d7d',
-          clientSecret: 'db431a4b80c8d5ad2fb83c4c5b43d8c0a42e0ce8ffb537c06c76e5e6f8ee4e8e',
-          script: code,
+          language: 'c++',
+          version: '10.2.0',
+          files: [{
+            name: 'main.cpp',
+            content: code
+          }],
           stdin: stdin || '',
-          language: 'cpp17',
-          versionIndex: '0',
         }),
       });
 
       const result = await response.json();
       
-      setOutput({
-        stdout: result.output || '',
-        stderr: result.error || '',
-        exitCode: result.statusCode || 0,
-        executionTime: parseInt(result.cpuTime || '0') * 1000,
-        compilationError: result.compilationStatus === 'error' ? result.output : undefined
-      });
+      if (result.compile) {
+        // Compilation output exists
+        setOutput({
+          stdout: result.run?.stdout || '',
+          stderr: result.run?.stderr || '',
+          exitCode: result.run?.code || 0,
+          executionTime: 0,
+          compilationError: result.compile?.code !== 0 ? result.compile?.stderr || result.compile?.stdout : undefined
+        });
+      } else {
+        // No compilation step, just execution
+        setOutput({
+          stdout: result.run?.stdout || '',
+          stderr: result.run?.stderr || result.run?.output || '',
+          exitCode: result.run?.code || 0,
+          executionTime: 0,
+        });
+      }
     } catch (error) {
       setOutput({
         stdout: '',

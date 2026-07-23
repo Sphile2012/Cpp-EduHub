@@ -44,6 +44,16 @@ export function useGetGlossaryTerm(slug: string) {
   };
 }
 
+export function useGetLessonQuiz(lessonId: string) {
+  const data = useMemo(() => staticData.getQuizForLesson(lessonId), [lessonId]);
+  
+  return {
+    data,
+    isLoading: false,
+    error: null
+  };
+}
+
 export function useGetProgress() {
   // Return empty progress since we're using local storage
   return {

@@ -1,5 +1,5 @@
 import { useParams, useLocation } from "wouter";
-import { useGetLessonQuiz } from "@workspace/api-client-react";
+import { useGetLessonQuiz } from "@/hooks/use-static-data";
 import { useState, useEffect } from "react";
 import { useLocalProgress } from "@/hooks/use-local-progress";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ export default function QuizPage() {
   const { lessonId: lessonIdParam } = useParams<{ lessonId: string }>();
   const [_, setLocation] = useLocation();
   const lessonId = lessonIdParam || "";
-  const { data: questions, isLoading } = useGetLessonQuiz(lessonId);
+  const { data: questions } = useGetLessonQuiz(lessonId);
   const { saveQuizScore } = useLocalProgress();
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -23,8 +23,15 @@ export default function QuizPage() {
   const [isFinished, setIsFinished] = useState(false);
   const [score, setScore] = useState(0);
 
-  if (isLoading || !questions) return <div className="p-8 text-center animate-pulse">Loading quiz...</div>;
-  if (questions.length === 0) return <div className="p-8 text-center">No questions available for this lesson.</div>;
+  if (!questions || questions.length === 0) {
+    return (
+      <div className="p-8 text-center">
+        <h2 className="text-2xl font-bold mb-4">No Quiz Available</h2>
+        <p className="text-muted-foreground mb-6">There is no quiz for this lesson yet.</p>
+        <Button onClick={() => setLocation('/lessons')}>Back to Lessons</Button>
+      </div>
+    );
+  }
 
   const currentQ = questions[currentIndex];
   const hasAnsweredCurrent = !!answers[currentQ.id];

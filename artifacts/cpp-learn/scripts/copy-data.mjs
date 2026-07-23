@@ -15,35 +15,34 @@ console.log('📦 Copying data from API server to frontend...');
 const glossaryContent = readFileSync(join(apiServerPath, 'glossary.ts'), 'utf-8');
 const lessonsContent = readFileSync(join(apiServerPath, 'lessons.ts'), 'utf-8');
 
-// Create the static data file
+// Simply re-export the modules - let TypeScript handle the compilation
 const staticDataContent = `// Auto-generated file - do not edit manually
 // Generated from API server data files
+// This file re-exports glossary and lesson data for static builds
 
 ${glossaryContent}
 
 ${lessonsContent}
 
 // Re-export for convenience
-export { glossaryTerms as GLOSSARY_TERMS_DETAIL, getGlossaryList, getGlossaryTerm };
-export { lessons as LESSONS };
-
 export const GLOSSARY_TERMS = getGlossaryList();
+export const LESSONS = lessons;
 
 export function getLessons() {
-  return LESSONS;
+  return lessons;
 }
 
 export function getGlossary() {
-  return GLOSSARY_TERMS;
+  return getGlossaryList();
 }
 
 export function getLesson(id: string) {
-  return LESSONS.find(lesson => lesson.id === id);
+  return lessons.find(lesson => lesson.id === id);
 }
 `;
 
 writeFileSync(join(frontendPath, 'static-data.ts'), staticDataContent);
 
 console.log('✅ Data copied successfully!');
-console.log(`   - Glossary terms: ${glossaryContent.match(/term:/g)?.length || 0}`);
-console.log(`   - Lessons: ${lessonsContent.match(/id:/g)?.length || 0}`);
+console.log(`   - Glossary terms: ${(glossaryContent.match(/term:/g) || []).length}`);
+console.log(`   - Lessons: ${(lessonsContent.match(/id:/g) || []).length}`);

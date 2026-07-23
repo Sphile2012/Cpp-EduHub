@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useRunCode, CodeRunResult } from "@workspace/api-client-react";
-import { Terminal, Play, Loader2, Maximize2, Minimize2, AlertCircle } from "lucide-react";
+import { Terminal, Play, Loader2, Maximize2, Minimize2, AlertCircle, Save, Trash2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Editor from '@monaco-editor/react';
 
 interface PlaygroundPanelProps {
   initialCode?: string;
@@ -12,8 +13,10 @@ export function PlaygroundPanel({ initialCode = "" }: PlaygroundPanelProps) {
   const [stdin, setStdin] = useState("");
   const [output, setOutput] = useState<CodeRunResult | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isEditorReady, setIsEditorReady] = useState(false);
   
   const runCodeMutation = useRunCode();
+  const editorRef = useRef<any>(null);
 
   // Update code when initialCode prop changes
   useEffect(() => {
@@ -22,28 +25,51 @@ export function PlaygroundPanel({ initialCode = "" }: PlaygroundPanelProps) {
     }
   }, [initialCode]);
 
+  const handleEditorDidMount = (editor: any, monaco: any) => {
+    editorRef.current = editor;
+    setIsEditorReady(true);
+    
+    // Add keyboard shortcuts
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
+      handleRun();
+    });
+  };
+
   const handleRun = () => {
     runCodeMutation.mutate({ data: { code, stdin: stdin || undefined } }, {
       onSuccess: (data) => setOutput(data)
     });
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      const target = e.target as HTMLTextAreaElement;
-      const start = target.selectionStart;
-      const end = target.selectionEnd;
-      setCode(code.substring(0, start) + "    " + code.substring(end));
-      // Focus restoration happens naturally but cursor needs manual adjustment
-      setTimeout(() => {
-        target.selectionStart = target.selectionEnd = start + 4;
-      }, 0);
+  const handleSave = () => {
+    localStorage.setItem('cpp-playground-code', code);
+    // Show a toast or notification
+    console.log('Code saved!');
+  };
+
+  const handleLoad = () => {
+    const saved = localStorage.getItem('cpp-playground-code');
+    if (saved) {
+      setCode(saved);
     }
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-      e.preventDefault();
-      handleRun();
+  };
+
+  const handleClear = () => {
+    if (confirm('Are you sure you want to clear the editor?')) {
+      setCode('#include <iostream>\n\nint main() {\n    std::cout << "Hello, World!" << std::endl;\n    return 0;\n}');
+      setOutput(null);
+      setStdin('');
     }
+  };
+
+  const handleDownload = () => {
+    const blob = new Blob([code], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'program.cpp';
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -55,6 +81,34 @@ export function PlaygroundPanel({ initialCode = "" }: PlaygroundPanelProps) {
           <span className="font-mono text-sm text-zinc-300 font-medium tracking-wide">workspace.cpp</span>
         </div>
         <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-8 w-8 text-zinc-400 hover:text-white hover:bg-zinc-700"
+            onClick={handleSave}
+            title="Save to browser storage"
+          >
+            <Save className="w-4 h-4" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-8 w-8 text-zinc-400 hover:text-white hover:bg-zinc-700"
+            onClick={handleDownload}
+            title="Download as .cpp file"
+          >
+            <Download className="w-4 h-4" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-8 w-8 text-zinc-400 hover:text-white hover:bg-zinc-700"
+            onClick={handleClear}
+            title="Clear editor"
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+          <div className="w-px h-6 bg-zinc-700" />
           <Button 
             variant="ghost" 
             size="icon" 
@@ -74,29 +128,46 @@ export function PlaygroundPanel({ initialCode = "" }: PlaygroundPanelProps) {
         </div>
       </div>
 
-      {/* Editor Area */}
-      <div className="flex-1 relative bg-[#1e1e1e] flex flex-col min-h-0">
-        <div className="flex-1 relative flex">
-          {/* Line numbers (fake) */}
-          <div className="w-10 bg-[#252525] border-r border-[#333] flex-shrink-0 pt-4 flex flex-col items-center text-[#666] font-mono text-sm leading-relaxed select-none">
-            {code.split('\n').map((_, i) => <div key={i}>{i + 1}</div>)}
-          </div>
-          <textarea
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            onKeyDown={handleKeyDown}
-            spellCheck={false}
-            className="flex-1 w-full p-4 bg-transparent text-zinc-100 font-mono text-sm leading-relaxed resize-none focus:outline-none whitespace-pre overflow-auto"
-            style={{ tabSize: 4 }}
-          />
-        </div>
+      {/* Monaco Editor */}
+      <div className="flex-1 relative bg-[#1e1e1e] min-h-0">
+        <Editor
+          height="100%"
+          defaultLanguage="cpp"
+          value={code}
+          onChange={(value) => setCode(value || '')}
+          onMount={handleEditorDidMount}
+          theme="vs-dark"
+          options={{
+            minimap: { enabled: true },
+            fontSize: 14,
+            fontFamily: "'Fira Code', 'Consolas', 'Monaco', monospace",
+            fontLigatures: true,
+            lineNumbers: 'on',
+            scrollBeyondLastLine: false,
+            automaticLayout: true,
+            tabSize: 4,
+            insertSpaces: true,
+            wordWrap: 'on',
+            bracketPairColorization: {
+              enabled: true
+            },
+            smoothScrolling: true,
+            cursorBlinking: 'smooth',
+            cursorSmoothCaretAnimation: 'on',
+            formatOnPaste: true,
+            formatOnType: true,
+            suggestOnTriggerCharacters: true,
+            quickSuggestions: true,
+            acceptSuggestionOnEnter: 'on',
+          }}
+        />
       </div>
 
-      {/* Stdin Area (Collapsible) */}
+      {/* Stdin Area */}
       <div className="h-16 border-t border-[#333] bg-[#252525]">
         <input
           type="text"
-          placeholder="Standard Input (stdin)..."
+          placeholder="Standard Input (stdin) - e.g., 5 10 hello"
           value={stdin}
           onChange={(e) => setStdin(e.target.value)}
           className="w-full h-full bg-transparent px-4 font-mono text-sm text-zinc-300 placeholder:text-zinc-600 focus:outline-none"

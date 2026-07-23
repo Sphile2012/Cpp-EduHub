@@ -1,0 +1,53 @@
+⚠️ OPENAI_API_KEY not set. AI features will not work.
+[14:13:56.815] [32mINFO[39m (9744): [36mServer listening[39m
+    [35mport[39m: 3000
+[14:25:24.291] [32mINFO[39m (9744): [36mrequest completed[39m
+    [35mreq[39m: {
+      "id": 1,
+      "method": "GET",
+      "url": "/"
+    }
+    [35mres[39m: {
+      "statusCode": 404
+    }
+    [35mresponseTime[39m: 142
+[14:25:24.310] [32mINFO[39m (9744): [36mrequest completed[39m
+    [35mreq[39m: {
+      "id": 2,
+      "method": "GET",
+      "url": "/"
+    }
+    [35mres[39m: {
+      "statusCode": 404
+    }
+    [35mresponseTime[39m: 1
+[14:25:26.311] [32mINFO[39m (9744): [36mrequest completed[39m
+    [35mreq[39m: {
+      "id": 3,
+      "method": "GET",
+      "url": "/favicon.svg"
+    }
+    [35mres[39m: {
+      "statusCode": 404
+    }
+    [35mresponseTime[39m: 2
+[14:25:26.324] [32mINFO[39m (9744): [36mrequest completed[39m
+    [35mreq[39m: {
+      "id": 4,
+      "method": "GET",
+      "url": "/pwa-192x192.svg"
+    }
+    [35mres[39m: {
+      "statusCode": 404
+    }
+    [35mresponseTime[39m: 11
+[14:25:31.506] [32mINFO[39m (9744): [36mrequest completed[39m
+    [35mreq[39m: {
+      "id": 5,
+      "method": "GET",
+      "url": "/ai-tutor"
+    }
+    [35mres[39m: {
+      "statusCode": 404
+    }
+    [35mresponseTime[39m: 4

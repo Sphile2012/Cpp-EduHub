@@ -5,7 +5,9 @@ import {
   Trophy, 
   Library, 
   Layers,
-  LayoutDashboard
+  LayoutDashboard,
+  Bot,
+  Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocalProgress } from "@/hooks/use-local-progress";
@@ -20,6 +22,8 @@ export function Sidebar({ className }: { className?: string }) {
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
     { href: "/lessons", label: "Lessons", icon: BookOpen },
     { href: "/playground", label: "Playground", icon: TerminalSquare },
+    { href: "/learning-hub", label: "Learning Hub", icon: Sparkles },
+    { href: "/ai-tutor", label: "AI Tutor", icon: Bot },
     { href: "/glossary", label: "Glossary", icon: Library },
     { href: "/flashcards", label: "Flashcards", icon: Layers },
     { href: "/achievements", label: "Achievements", icon: Trophy },

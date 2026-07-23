@@ -1,0 +1,13 @@
+
+> @workspace/api-server@0.0.0 build C:\Users\Phumeh\Downloads\kunzima\Cpp-EduHub\artifacts\api-server
+> node ./build.mjs
+
+
+  dist\index.mjs                   1.9mb
+  dist\pino-worker.mjs           153.5kb
+  dist\pino-file.mjs             142.1kb
+  dist\pino-pretty.mjs           114.4kb
+  dist\thread-stream-worker.mjs    7.4kb
+  ...and 5 more output files...
+
+Done in 7601ms

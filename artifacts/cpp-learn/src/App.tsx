@@ -14,6 +14,9 @@ import GlossaryTerm from '@/pages/glossary-term';
 import FullPlayground from '@/pages/playground';
 import AchievementsPage from '@/pages/achievements';
 import FlashcardsPage from '@/pages/flashcards';
+import AITutorPage from '@/pages/ai-tutor';
+import AIStudyPlanner from '@/pages/ai-study-planner';
+import LearningHubPage from '@/pages/learning-hub';
 import NotFound from '@/pages/not-found';
 
 const queryClient = new QueryClient({
@@ -36,6 +39,9 @@ function Router() {
         <Route path="/glossary" component={GlossaryList} />
         <Route path="/glossary/:slug" component={GlossaryTerm} />
         <Route path="/playground" component={FullPlayground} />
+        <Route path="/ai-tutor" component={AITutorPage} />
+        <Route path="/ai-study-planner" component={AIStudyPlanner} />
+        <Route path="/learning-hub" component={LearningHubPage} />
         <Route path="/achievements" component={AchievementsPage} />
         <Route path="/flashcards" component={FlashcardsPage} />
         <Route component={NotFound} />

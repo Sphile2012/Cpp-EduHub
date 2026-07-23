@@ -1,5 +1,3 @@
-import { cn } from "@/lib/utils";
-
 export function SimpleSyntaxHighlighter({ code, language = "cpp" }: { code: string, language?: string }) {
   // A very basic regex-based syntax highlighter for C++
   const highlight = (text: string) => {
@@ -35,7 +33,7 @@ export function SimpleSyntaxHighlighter({ code, language = "cpp" }: { code: stri
 
   return (
     <pre className="font-mono text-sm leading-relaxed overflow-x-auto p-4 rounded-lg bg-black/40 border shadow-inner">
-      <code dangerouslySetLabel={{ __html: highlight(code) }} dangerouslySetInnerHTML={{ __html: highlight(code) }} />
+      <code dangerouslySetInnerHTML={{ __html: highlight(code) }} />
     </pre>
   );
 }

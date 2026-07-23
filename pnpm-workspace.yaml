@@ -159,7 +159,7 @@ overrides:
   esbuild: "0.28.1"
 
 allowBuilds:
-  esbuild: set this to true or false
+  esbuild: true
 
 # Disable TTY check for non-interactive environments
 confirmModulesPurge: false

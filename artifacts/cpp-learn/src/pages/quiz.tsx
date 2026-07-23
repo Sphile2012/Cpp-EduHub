@@ -10,6 +10,7 @@ import { CheckCircle2, XCircle, Trophy, ArrowRight, RotateCcw, BookOpen } from "
 import { motion, AnimatePresence } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "wouter";
+import { ClearCacheButton } from "@/components/clear-cache-button";
 
 export default function QuizPage() {
   const { lessonId: lessonIdParam } = useParams<{ lessonId: string }>();
@@ -24,6 +25,11 @@ export default function QuizPage() {
   const [showExplanation, setShowExplanation] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [score, setScore] = useState(0);
+
+  // Debug logging
+  console.log('Quiz Page - Lesson ID:', lessonId);
+  console.log('Quiz Questions:', questions);
+  console.log('Questions count:', questions?.length || 0);
 
   if (!questions || questions.length === 0) {
     // Find lessons that have quizzes

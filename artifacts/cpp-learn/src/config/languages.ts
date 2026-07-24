@@ -138,6 +138,42 @@ console.log(greeting);`,
 
 export const LANGUAGE_ORDER: LanguageId[] = ['cpp', 'python', 'java', 'javascript', 'typescript'];
 
+export function isLanguageId(value: string): value is LanguageId {
+  return LANGUAGE_ORDER.includes(value as LanguageId);
+}
+
+export function normalizeLanguageId(value: string | null | undefined): LanguageId | null {
+  if (!value) {
+    return null;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  const aliases: Record<string, LanguageId> = {
+    'c++': 'cpp',
+    'c': 'cpp',
+    'cpp': 'cpp',
+    'python': 'python',
+    'py': 'python',
+    'java': 'java',
+    'jave': 'java',
+    'jav': 'java',
+    'javascript': 'javascript',
+    'js': 'javascript',
+    'typescript': 'typescript',
+    'ts': 'typescript',
+  };
+
+  if (aliases[normalized]) {
+    return aliases[normalized];
+  }
+
+  if (isLanguageId(normalized)) {
+    return normalized as LanguageId;
+  }
+
+  return null;
+}
+
 export function getLanguageConfig(id: LanguageId): LanguageConfig {
   return LANGUAGES[id];
 }
@@ -147,14 +183,11 @@ export function getAllLanguages(): LanguageConfig[] {
 }
 
 export function getLanguageById(id: string): LanguageConfig | undefined {
-  if (isLanguageId(id)) {
-    return LANGUAGES[id];
+  const normalized = normalizeLanguageId(id);
+  if (normalized) {
+    return LANGUAGES[normalized];
   }
   return undefined;
-}
-
-export function isLanguageId(value: string): value is LanguageId {
-  return LANGUAGE_ORDER.includes(value as LanguageId);
 }
 
 // Default language (used when no selection has been made)

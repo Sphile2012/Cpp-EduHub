@@ -3,7 +3,7 @@
  */
 
 import { useState } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { UserPlus, Mail, Lock, User, Eye, EyeOff, ArrowLeft, CheckCircle2, Chrome } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
@@ -15,6 +15,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function SignupPage() {
   const { signup, loginWithGoogle, error, clearError } = useAuth();
+  const [, navigate] = useLocation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -62,10 +63,11 @@ export default function SignupPage() {
     
     const success = await signup(email, password, name);
     
-    if (!success) {
+    if (success) {
+      navigate('/');
+    } else {
       setIsLoading(false);
     }
-    // If success, the user will be redirected by the auth flow
   };
 
   const displayError = localError || error;
@@ -77,7 +79,9 @@ export default function SignupPage() {
     
     const success = await loginWithGoogle();
     
-    if (!success) {
+    if (success) {
+      navigate('/');
+    } else {
       setIsLoading(false);
     }
   };

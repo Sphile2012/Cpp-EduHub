@@ -10,6 +10,7 @@ import { useLanguage } from '@/hooks/use-language';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { getAllLanguages, type LanguageId } from '@/config/languages';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -19,6 +20,7 @@ import { Switch } from '@/components/ui/switch';
 export default function ProfilePage() {
   const { user, updateProfile, logout, loginWithGoogle } = useAuth();
   const { languageConfig } = useLanguage();
+  const languages = getAllLanguages();
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(user?.name || '');
   const [editBio, setEditBio] = useState(user?.bio || '');
@@ -220,6 +222,29 @@ export default function ProfilePage() {
                 />
               </div>
               
+              <div className="space-y-2">
+                <Label htmlFor="preferred-language">Preferred Language</Label>
+                <select
+                  id="preferred-language"
+                  value={user.preferredLanguage}
+                  onChange={async (event) => {
+                    await updateProfile({
+                      preferredLanguage: event.target.value as LanguageId,
+                    });
+                  }}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                >
+                  {languages.map((language) => (
+                    <option key={language.id} value={language.id}>
+                      {language.displayName}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-sm text-muted-foreground">
+                  This updates the language shown across your learning experience.
+                </p>
+              </div>
+
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Theme</p>

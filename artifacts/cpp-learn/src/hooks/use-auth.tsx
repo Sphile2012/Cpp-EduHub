@@ -6,6 +6,8 @@
 
 import { useState, useEffect, useCallback, createContext, useContext, type ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { DEFAULT_LANGUAGE, normalizeLanguageId, type LanguageId } from '@/config/languages';
+import { useLanguage } from '@/hooks/use-language';
 
 export interface UserProfile {
   id: string;
@@ -14,6 +16,7 @@ export interface UserProfile {
   avatar?: string;
   bio?: string;
   joinDate: string;
+  preferredLanguage: LanguageId;
   preferences: {
     theme: 'light' | 'dark' | 'system';
     notifications: boolean;
@@ -63,6 +66,7 @@ export function useAuthProvider() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const { currentLanguage, setLanguage } = useLanguage();
 
   // Load user from localStorage on mount
   useEffect(() => {
@@ -70,7 +74,12 @@ export function useAuthProvider() {
       try {
         const savedUser = localStorage.getItem(STORAGE_KEYS.USER);
         if (savedUser) {
-          setUser(JSON.parse(savedUser));
+          const parsedUser = JSON.parse(savedUser) as UserProfile;
+          const normalizedLanguage = normalizeLanguageId(parsedUser.preferredLanguage);
+          if (normalizedLanguage) {
+            setLanguage(normalizedLanguage);
+          }
+          setUser(parsedUser);
         }
       } catch (e) {
         console.error('Failed to load user:', e);
@@ -79,7 +88,7 @@ export function useAuthProvider() {
       }
     };
     loadUser();
-  }, []);
+  }, [setLanguage]);
 
   const loginWithGoogle = useCallback(async (): Promise<boolean> => {
     try {
@@ -88,6 +97,9 @@ export function useAuthProvider() {
       // Simulate Google OAuth flow
       await new Promise(resolve => setTimeout(resolve, 1500));
       
+      const preferredLanguage = normalizeLanguageId(currentLanguage) ?? DEFAULT_LANGUAGE;
+      setLanguage(preferredLanguage);
+
       // In production, this would trigger the Google OAuth popup
       // For demo purposes, create a mock Google user
       const mockUser: UserProfile = {
@@ -96,6 +108,7 @@ export function useAuthProvider() {
         name: 'Google User',
         avatar: 'https://ui-avatars.com/api/?name=Google+User&background=4285F4&color=fff',
         joinDate: new Date().toISOString(),
+        preferredLanguage,
         preferences: {
           theme: 'system',
           notifications: true,
@@ -129,7 +142,7 @@ export function useAuthProvider() {
       });
       return false;
     }
-  }, [toast]);
+  }, [currentLanguage, setLanguage, toast]);
 
   const login = useCallback(async (email: string, password: string): Promise<boolean> => {
     try {
@@ -138,6 +151,9 @@ export function useAuthProvider() {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      const preferredLanguage = normalizeLanguageId(currentLanguage) ?? DEFAULT_LANGUAGE;
+      setLanguage(preferredLanguage);
+
       // For demo purposes, accept any email/password combination
       // In production, this would call your backend API
       const mockUser: UserProfile = {
@@ -145,6 +161,7 @@ export function useAuthProvider() {
         email: email,
         name: email.split('@')[0],
         joinDate: new Date().toISOString(),
+        preferredLanguage,
         preferences: {
           theme: 'system',
           notifications: true,
@@ -178,7 +195,7 @@ export function useAuthProvider() {
       });
       return false;
     }
-  }, [toast]);
+  }, [currentLanguage, setLanguage, toast]);
 
   const signup = useCallback(async (email: string, password: string, name: string): Promise<boolean> => {
     try {
@@ -210,6 +227,9 @@ export function useAuthProvider() {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      const preferredLanguage = normalizeLanguageId(currentLanguage) ?? DEFAULT_LANGUAGE;
+      setLanguage(preferredLanguage);
+
       // For demo purposes, create user immediately
       // In production, this would call your backend API
       const mockUser: UserProfile = {
@@ -217,6 +237,7 @@ export function useAuthProvider() {
         email: email,
         name: name,
         joinDate: new Date().toISOString(),
+        preferredLanguage,
         preferences: {
           theme: 'system',
           notifications: true,
@@ -250,7 +271,7 @@ export function useAuthProvider() {
       });
       return false;
     }
-  }, [toast]);
+  }, [currentLanguage, setLanguage, toast]);
 
   const logout = useCallback(() => {
     setUser(null);
@@ -275,7 +296,21 @@ export function useAuthProvider() {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      const updatedUser = { ...user, ...updates };
+      const normalizedLanguage = normalizeLanguageId(updates.preferredLanguage ?? user.preferredLanguage);
+      const updatedUser: UserProfile = {
+        ...user,
+        ...updates,
+        preferredLanguage: normalizedLanguage ?? user.preferredLanguage ?? DEFAULT_LANGUAGE,
+        preferences: {
+          ...user.preferences,
+          ...(updates.preferences ?? {}),
+        },
+      };
+
+      if (normalizedLanguage) {
+        setLanguage(normalizedLanguage);
+      }
+
       setUser(updatedUser);
       localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser));
       
@@ -295,7 +330,7 @@ export function useAuthProvider() {
       });
       return false;
     }
-  }, [user, toast]);
+  }, [setLanguage, user, toast]);
 
   const clearError = useCallback(() => {
     setError(null);

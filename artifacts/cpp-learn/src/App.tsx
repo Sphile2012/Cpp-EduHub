@@ -1,10 +1,12 @@
+import { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Route, Switch, Router as WouterRouter } from 'wouter';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LanguageProvider, useLanguage } from '@/hooks/use-language';
-import { AuthProvider, useAuth } from '@/hooks/use-auth';
+import { AuthProvider } from '@/hooks/use-auth';
+import { DEFAULT_LANGUAGE } from '@/config/languages';
 import LanguageSelector from '@/components/language-selector';
 
 // Pages
@@ -36,15 +38,13 @@ const queryClient = new QueryClient({
 
 // Component that conditionally renders based on language selection
 function AppRoutes() {
-  const { hasSelectedLanguage, currentLanguage } = useLanguage();
-  const { isAuthenticated } = useAuth();
+  const { hasSelectedLanguage, setLanguage } = useLanguage();
 
-  // If no language selected, automatically select C++ (default) instead of showing selector
-  if (!hasSelectedLanguage) {
-    // Auto-select C++ on first visit
-    const { setLanguage } = useLanguage();
-    setLanguage('cpp');
-  }
+  useEffect(() => {
+    if (!hasSelectedLanguage) {
+      setLanguage(DEFAULT_LANGUAGE);
+    }
+  }, [hasSelectedLanguage, setLanguage]);
 
   // Always show the main app with layout
   return (
@@ -75,13 +75,13 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <AuthProvider>
-          <LanguageProvider>
+        <LanguageProvider>
+          <AuthProvider>
             <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
               <AppRoutes />
             </WouterRouter>
-          </LanguageProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </LanguageProvider>
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>

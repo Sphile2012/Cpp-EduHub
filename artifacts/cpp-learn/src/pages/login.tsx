@@ -3,7 +3,7 @@
  */
 
 import { useState } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { LogIn, Mail, Lock, Eye, EyeOff, ArrowLeft, Chrome } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
@@ -15,6 +15,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function LoginPage() {
   const { login, loginWithGoogle, error, clearError } = useAuth();
+  const [, navigate] = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -27,10 +28,11 @@ export default function LoginPage() {
     
     const success = await login(email, password);
     
-    if (!success) {
+    if (success) {
+      navigate('/');
+    } else {
       setIsLoading(false);
     }
-    // If success, the user will be redirected by the auth flow
   };
 
   const handleGoogleLogin = async () => {
@@ -39,7 +41,9 @@ export default function LoginPage() {
     
     const success = await loginWithGoogle();
     
-    if (!success) {
+    if (success) {
+      navigate('/');
+    } else {
       setIsLoading(false);
     }
   };

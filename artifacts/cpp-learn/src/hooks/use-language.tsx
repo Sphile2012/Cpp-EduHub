@@ -7,14 +7,14 @@
 
 import { useState, useEffect, useCallback, createContext, useContext, type ReactNode } from 'react';
 import type { LanguageId } from '@/config/languages';
-import { DEFAULT_LANGUAGE, getLanguageConfig, LANGUAGES } from '@/config/languages';
+import { DEFAULT_LANGUAGE, getLanguageConfig, LANGUAGES, normalizeLanguageId } from '@/config/languages';
 
 const STORAGE_KEY = 'uphumeh_selected_language';
 
 interface LanguageContextType {
   selectedLanguage: LanguageId | null;
   hasSelectedLanguage: boolean;
-  setSelectedLanguage: (language: LanguageId) => void;
+  setSelectedLanguage: (language: LanguageId | string) => void;
   clearLanguageSelection: () => void;
   languageConfig: ReturnType<typeof getLanguageConfig> | null;
 }
@@ -34,15 +34,21 @@ export function useLanguageProvider() {
   useEffect(() => {
     // Load from localStorage on mount
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved && saved in LANGUAGES) {
-      setSelectedLanguageState(saved as LanguageId);
+    const normalized = normalizeLanguageId(saved);
+    if (normalized) {
+      setSelectedLanguageState(normalized);
     }
     setIsLoaded(true);
   }, []);
 
-  const setSelectedLanguage = useCallback((language: LanguageId) => {
-    setSelectedLanguageState(language);
-    localStorage.setItem(STORAGE_KEY, language);
+  const setSelectedLanguage = useCallback((language: LanguageId | string) => {
+    const normalized = normalizeLanguageId(language);
+    if (!normalized) {
+      return;
+    }
+
+    setSelectedLanguageState(normalized);
+    localStorage.setItem(STORAGE_KEY, normalized);
   }, []);
 
   const clearLanguageSelection = useCallback(() => {

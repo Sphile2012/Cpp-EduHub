@@ -10,6 +10,7 @@ import type { LanguageId } from '@/config/languages';
 import type { LanguageContent, LessonData, GlossaryTermData, QuizData, LessonSection } from './types';
 import { glossaryTerms as cppGlossaryTerms, lessons as cppLessons, quizzes as cppQuizzes } from '@/lib/static-data';
 import { pythonLessons, pythonGlossary, pythonQuizzes } from './python-content';
+import { javaLessons, javaGlossary, javaQuizzes } from './java-content';
 
 // Language content cache
 const contentCache = new Map<LanguageId, LanguageContent>();
@@ -208,14 +209,23 @@ function getPythonContent(): LanguageContent {
 }
 
 /**
- * Get Java content (placeholder - to be expanded)
+ * Get Java content
  */
 function getJavaContent(): LanguageContent {
-  return {
-    lessons: getPlaceholderLessons('java', 'Java'),
-    glossary: getPlaceholderGlossary('java', 'Java'),
-    quizzes: getPlaceholderQuizzes('java', 'Java'),
-  };
+  const lessons: LessonData[] = javaLessons.map((lesson, index) => normalizeLessonData(lesson, index, javaLessons.length));
+  const glossary: GlossaryTermData[] = javaGlossary;
+  
+  // Convert javaQuizzes Record to QuizData[]
+  const quizzes: QuizData[] = Object.entries(javaQuizzes).map(([lessonId, questions]) => ({
+    id: `quiz-${lessonId}`,
+    title: `${lessonId} Quiz`,
+    description: `Test your knowledge of ${lessonId}`,
+    questions: questions,
+    passingScore: 70,
+    difficulty: 'beginner',
+  }));
+  
+  return { lessons, glossary, quizzes };
 }
 
 /**

@@ -390,6 +390,380 @@ print(f"Min: {minimum}, Max: {maximum}, Avg: {average}")`,
     topics: ['functions', 'reuse', 'abstraction'],
     keyPoints: ['Functions group reusable logic', 'Parameters make functions flexible'],
   },
+  {
+    id: 'python-lists',
+    title: 'Lists and Collections',
+    description: 'Master Python\'s versatile list data structure and common operations.',
+    order: 7,
+    difficulty: 'beginner',
+    estimatedMinutes: 30,
+    content: `# Lists and Collections
+
+Lists are Python's most versatile data structure for storing collections of items.
+
+## Creating Lists
+\`\`\`python
+# Empty list
+numbers = []
+
+# List with items
+fruits = ["apple", "banana", "cherry"]
+
+# Mixed types (legal in Python!)
+mixed = [1, "hello", 3.14, True]
+\`\`\`
+
+## Accessing Items
+\`\`\`python
+fruits = ["apple", "banana", "cherry"]
+
+# Indexing (0-based)
+print(fruits[0])    # apple
+print(fruits[1])    # banana
+print(fruits[-1])   # cherry (last item)
+print(fruits[-2])   # banana (second from end)
+
+# Slicing
+print(fruits[0:2])  # ['apple', 'banana']
+print(fruits[1:])   # ['banana', 'cherry']
+print(fruits[:2])   # ['apple', 'banana']
+\`\`\`
+
+## Modifying Lists
+\`\`\`python
+fruits.append("orange")      # Add to end
+fruits.insert(1, "mango")    # Insert at index
+fruits.remove("banana")      # Remove by value
+popped = fruits.pop()        # Remove and return last
+fruits[0] = "pear"           # Change by index
+\`\`\`
+
+## List Methods
+- \`len(list)\`: Get length
+- \`list.sort()\`: Sort in place
+- \`list.reverse()\`: Reverse in place
+- \`list.count(item)\`: Count occurrences
+- \`list.index(item)\`: Find index`,
+    codeExamples: [
+      {
+        id: 'py-lists',
+        title: 'Working with Lists',
+        code: `# Creating and modifying lists
+shopping = ["eggs", "milk", "bread"]
+print(f"Items: {len(shopping)}")  # 3
+
+# Adding items
+shopping.append("cheese")
+shopping.insert(0, "butter")
+print(shopping)  # ['butter', 'eggs', 'milk', 'bread', 'cheese']
+
+# Removing items
+shopping.remove("milk")
+last_item = shopping.pop()
+print(f"Removed: {last_item}")  # cheese
+print(shopping)  # ['butter', 'eggs', 'bread']
+
+# List operations
+numbers = [3, 1, 4, 1, 5, 9, 2]
+print(f"Sum: {sum(numbers)}")      # 25
+print(f"Max: {max(numbers)}")      # 9
+print(f"Sorted: {sorted(numbers)}")  # [1, 1, 2, 3, 4, 5, 9]`,
+        explanation: 'Lists are mutable and support a rich set of operations.',
+        language: 'python',
+      },
+    ],
+    quizQuestions: [],
+    prerequisites: ['python-loops'],
+    learningObjectives: [
+      'Create and modify lists',
+      'Access items by index and slice',
+      'Use common list methods',
+    ],
+    topics: ['lists', 'collections', 'data structures'],
+    keyPoints: ['Lists are mutable and ordered', 'Rich set of built-in methods'],
+  },
+  {
+    id: 'python-dictionaries',
+    title: 'Dictionaries',
+    description: 'Learn to work with key-value pairs using Python dictionaries.',
+    order: 8,
+    difficulty: 'beginner',
+    estimatedMinutes: 30,
+    content: `# Dictionaries
+
+Dictionaries store data as key-value pairs, allowing fast lookup by key.
+
+## Creating Dictionaries
+\`\`\`python
+# Empty dictionary
+person = {}
+
+# With data
+person = {
+    "name": "Alice",
+    "age": 25,
+    "city": "New York"
+}
+
+# Using dict()
+person = dict(name="Alice", age=25)
+\`\`\`
+
+## Accessing Values
+\`\`\`python
+print(person["name"])      # Alice
+print(person.get("age"))   # 25
+print(person.get("email", "N/A"))  # N/A (default)
+\`\`\`
+
+## Modifying Dictionaries
+\`\`\`python
+# Add or update
+person["email"] = "alice@example.com"
+person["age"] = 26
+
+# Remove
+del person["city"]
+removed = person.pop("age")
+
+# Check existence
+if "name" in person:
+    print("Name exists")
+\`\`\`
+
+## Iterating
+\`\`\`python
+# Keys
+for key in person:
+    print(key)
+
+# Values
+for value in person.values():
+    print(value)
+
+# Both
+for key, value in person.items():
+    print(f"{key}: {value}")
+\`\`\``,
+    codeExamples: [
+      {
+        id: 'py-dicts',
+        title: 'Dictionary Operations',
+        code: `# Student records
+student = {
+    "name": "Bob",
+    "age": 20,
+    "grades": [85, 90, 78],
+    "active": True
+}
+
+# Access and modify
+print(student["name"])  # Bob
+student["email"] = "bob@school.edu"
+student["grades"].append(92)
+
+# Safe access
+phone = student.get("phone", "No phone")
+print(phone)  # No phone
+
+# Iterate
+print("\\nStudent Info:")
+for key, value in student.items():
+    print(f"{key}: {value}")
+
+# Dictionary methods
+print(f"\\nKeys: {list(student.keys())}")
+print(f"Values: {list(student.values())}")`,
+        explanation: 'Dictionaries provide O(1) average lookup time by key.',
+        language: 'python',
+      },
+    ],
+    quizQuestions: [],
+    prerequisites: ['python-lists'],
+    learningObjectives: [
+      'Create and modify dictionaries',
+      'Access values safely',
+      'Iterate over keys and values',
+    ],
+    topics: ['dictionaries', 'data structures', 'hash tables'],
+    keyPoints: ['Fast key-based lookup', 'Keys must be immutable'],
+  },
+  {
+    id: 'python-strings',
+    title: 'String Manipulation',
+    description: 'Master string operations, formatting, and methods.',
+    order: 9,
+    difficulty: 'beginner',
+    estimatedMinutes: 25,
+    content: `# String Manipulation
+
+Strings are immutable sequences of characters with powerful methods.
+
+## String Methods
+\`\`\`python
+text = "Hello World"
+
+# Case
+text.upper()          # "HELLO WORLD"
+text.lower()          # "hello world"
+text.title()          # "Hello World"
+
+# Search
+text.startswith("H")  # True
+text.endswith("d")    # True
+text.find("World")    # 6 (index)
+
+# Modify
+text.replace("World", "Python")  # "Hello Python"
+text.strip()          # Remove whitespace
+text.split()          # Split into list
+\`\`\`
+
+## String Formatting
+\`\`\`python
+name = "Alice"
+age = 25
+
+# f-strings (preferred)
+message = f"My name is {name} and I'm {age}"
+
+# format()
+message = "My name is {} and I'm {}".format(name, age)
+
+# %
+message = "My name is %s and I'm %d" % (name, age)
+\`\`\`
+
+## Multiline Strings
+\`\`\`python
+text = """This is
+a multiline
+string"""
+\`\`\``,
+    codeExamples: [
+      {
+        id: 'py-strings',
+        title: 'String Operations',
+        code: `# String methods
+text = "  Python Programming  "
+print(f"Original: '{text}'")
+print(f"Stripped: '{text.strip()}'")
+print(f"Upper: '{text.upper()}'")
+
+# String formatting
+name = "Alice"
+score = 95.7
+print(f"{name} scored {score:.1f}%")  # Alice scored 95.7%
+
+# String operations
+sentence = "Python is awesome"
+words = sentence.split()
+print(words)  # ['Python', 'is', 'awesome']
+print("-".join(words))  # Python-is-awesome
+
+# Substring check
+if "Python" in sentence:
+    print("Found Python!")`,
+        explanation: 'Strings are immutable - methods return new strings.',
+        language: 'python',
+      },
+    ],
+    quizQuestions: [],
+    prerequisites: ['python-variables'],
+    learningObjectives: [
+      'Use string methods',
+      'Format strings with f-strings',
+      'Split and join strings',
+    ],
+    topics: ['strings', 'text', 'formatting'],
+    keyPoints: ['Strings are immutable', 'F-strings are the modern way'],
+  },
+  {
+    id: 'python-file-io',
+    title: 'File Input/Output',
+    description: 'Learn to read from and write to files in Python.',
+    order: 10,
+    difficulty: 'intermediate',
+    estimatedMinutes: 30,
+    content: `# File Input/Output
+
+Python makes file operations simple with built-in functions.
+
+## Reading Files
+\`\`\`python
+# Read entire file
+with open('data.txt', 'r') as file:
+    content = file.read()
+    print(content)
+
+# Read lines
+with open('data.txt', 'r') as file:
+    for line in file:
+        print(line.strip())
+
+# Read into list
+with open('data.txt', 'r') as file:
+    lines = file.readlines()
+\`\`\`
+
+## Writing Files
+\`\`\`python
+# Write (overwrites)
+with open('output.txt', 'w') as file:
+    file.write("Hello\\n")
+    file.write("World\\n")
+
+# Append
+with open('output.txt', 'a') as file:
+    file.write("New line\\n")
+\`\`\`
+
+## File Modes
+- \`'r'\`: Read (default)
+- \`'w'\`: Write (overwrites)
+- \`'a'\`: Append
+- \`'r+'\`: Read and write
+- \`'b'\`: Binary mode`,
+    codeExamples: [
+      {
+        id: 'py-files',
+        title: 'File Operations',
+        code: `# Writing to a file
+data = ["Alice,25", "Bob,30", "Charlie,35"]
+
+with open('people.txt', 'w') as file:
+    for line in data:
+        file.write(line + '\\n')
+
+print("File written successfully")
+
+# Reading from a file
+with open('people.txt', 'r') as file:
+    print("\\nFile contents:")
+    for line in file:
+        name, age = line.strip().split(',')
+        print(f"Name: {name}, Age: {age}")
+
+# Exception handling
+try:
+    with open('missing.txt', 'r') as file:
+        content = file.read()
+except FileNotFoundError:
+    print("File not found!")`,
+        explanation: 'The with statement automatically closes files.',
+        language: 'python',
+      },
+    ],
+    quizQuestions: [],
+    prerequisites: ['python-strings'],
+    learningObjectives: [
+      'Read from files',
+      'Write to files',
+      'Use with statement for safe file handling',
+    ],
+    topics: ['file io', 'files', 'reading', 'writing'],
+    keyPoints: ['Use with for automatic cleanup', 'Handle FileNotFoundError'],
+  },
 ];
 
 export const pythonGlossary: GlossaryTermData[] = [
@@ -539,6 +913,165 @@ if "name" in student:
       'Consider using defaultdict for automatic default values',
     ],
     relatedTerms: ['list', 'key', 'value', 'hash table'],
+  },
+  {
+    term: 'tuple',
+    slug: 'tuple',
+    shortDefinition: 'An immutable ordered collection of items.',
+    category: 'Data Structures',
+    definition: 'A tuple is like a list but cannot be changed after creation. Tuples are faster than lists and can be used as dictionary keys.',
+    whyItExists: 'Tuples provide immutable sequences, useful for data that shouldn\'t change and for returning multiple values from functions.',
+    syntax: `# Creating tuples
+point = (10, 20)
+colors = ("red", "green", "blue")
+single = (42,)  # Note the comma`,
+    analogy: 'A tuple is like a sealed package - once created, you can look at what\'s inside but can\'t change it.',
+    codeExample: `# Tuples
+coordinates = (10, 20, 30)
+print(coordinates[0])  # 10
+
+# Unpacking
+x, y, z = coordinates
+
+# Multiple return values
+def get_stats():
+    return 42, 100, 71  # Returns tuple
+
+min_val, max_val, avg = get_stats()`,
+    commonMistakes: [
+      'Forgetting comma for single-item tuple: (42,) not (42)',
+      'Trying to modify a tuple (TypeError)',
+      'Confusing tuples with lists',
+    ],
+    bestPractices: [
+      'Use tuples for immutable data',
+      'Use tuples to return multiple values from functions',
+      'Use tuples as dictionary keys when you need composite keys',
+    ],
+    relatedTerms: ['list', 'immutable', 'unpacking'],
+  },
+  {
+    term: 'module',
+    slug: 'module',
+    shortDefinition: 'A file containing Python code that can be imported.',
+    category: 'Modules',
+    definition: 'A module is a file containing Python definitions and statements. The file name is the module name with the .py extension.',
+    whyItExists: 'Modules organize code into reusable files, making programs more maintainable and allowing code reuse across projects.',
+    syntax: `# Import entire module
+import math
+
+# Import specific items
+from math import pi, sqrt
+
+# Import with alias
+import numpy as np`,
+    analogy: 'A module is like a toolbox - you can grab specific tools (functions) you need or carry the whole box.',
+    codeExample: `# Using built-in modules
+import math
+import random
+
+print(math.pi)  # 3.14159...
+print(math.sqrt(16))  # 4.0
+
+# Generate random number
+num = random.randint(1, 10)
+
+# Import your own modules
+# from my_functions import calculate_area`,
+    commonMistakes: [
+      'Circular imports (two modules importing each other)',
+      'Name conflicts when using from module import *',
+      'Not understanding module search path',
+    ],
+    bestPractices: [
+      'Use explicit imports (from math import sqrt)',
+      'Avoid wildcard imports (from module import *)',
+      'Organize related functions into modules',
+    ],
+    relatedTerms: ['package', 'import', 'library'],
+  },
+  {
+    term: 'exception',
+    slug: 'exception',
+    shortDefinition: 'An error that occurs during program execution.',
+    category: 'Error Handling',
+    definition: 'An exception is an event that disrupts the normal flow of a program. Python uses try/except blocks to handle exceptions gracefully.',
+    whyItExists: 'Exceptions allow programs to handle errors gracefully instead of crashing, improving user experience and program reliability.',
+    syntax: `try:
+    # Code that might raise exception
+    risky_operation()
+except ExceptionType:
+    # Handle the error
+    print("Error occurred")
+finally:
+    # Always runs
+    cleanup()`,
+    analogy: 'Exceptions are like catching a falling object - instead of letting it break, you catch it and decide what to do.',
+    codeExample: `# Exception handling
+try:
+    number = int(input("Enter a number: "))
+    result = 10 / number
+    print(f"Result: {result}")
+except ValueError:
+    print("Invalid number!")
+except ZeroDivisionError:
+    print("Cannot divide by zero!")
+except Exception as e:
+    print(f"Error: {e}")
+finally:
+    print("Execution complete")`,
+    commonMistakes: [
+      'Catching Exception instead of specific exceptions',
+      'Empty except blocks that hide errors',
+      'Not cleaning up resources in error cases',
+    ],
+    bestPractices: [
+      'Catch specific exceptions',
+      'Use finally for cleanup code',
+      'Raise informative error messages',
+    ],
+    relatedTerms: ['try', 'except', 'finally', 'raise'],
+  },
+  {
+    term: 'comprehension',
+    slug: 'comprehension',
+    shortDefinition: 'Concise syntax for creating lists, dicts, or sets from iterables.',
+    category: 'Advanced',
+    definition: 'List comprehensions provide a compact way to create lists by applying an expression to each item in an iterable.',
+    whyItExists: 'Comprehensions make code more readable and often faster than equivalent for-loop constructions.',
+    syntax: `# List comprehension
+[expression for item in iterable if condition]
+
+# Dict comprehension
+{key: value for item in iterable}
+
+# Set comprehension
+{expression for item in iterable}`,
+    analogy: 'A comprehension is like a production line - you process each item and collect the results.',
+    codeExample: `# List comprehension
+squares = [x**2 for x in range(10)]
+# [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+
+# With condition
+evens = [x for x in range(20) if x % 2 == 0]
+
+# Dict comprehension
+square_dict = {x: x**2 for x in range(5)}
+# {0: 0, 1: 1, 2: 4, 3: 9, 4: 16}
+
+# Nested
+matrix = [[i+j for j in range(3)] for i in range(3)]`,
+    commonMistakes: [
+      'Making comprehensions too complex and hard to read',
+      'Using comprehensions when a regular loop is clearer',
+      'Forgetting that comprehensions create new lists',
+    ],
+    bestPractices: [
+      'Keep comprehensions simple and readable',
+      'Use regular loops for complex logic',
+      'Use generator expressions for large datasets',
+    ],
+    relatedTerms: ['list', 'generator', 'map', 'filter'],
   },
 ];
 
@@ -733,6 +1266,134 @@ export const pythonQuizzes: Record<string, QuizQuestion[]> = {
       correctAnswer: 'True',
       explanation: 'Python functions can return multiple values as a tuple: return a, b, c',
       difficulty: 'beginner',
+    },
+  ],
+  'python-lists': [
+    {
+      id: 'py-q7-1',
+      lessonId: 'python-lists',
+      type: 'multiple_choice',
+      question: 'How do you access the last item in a Python list?',
+      options: ['list[end]', 'list[-1]', 'list[last]', 'list.last()'],
+      correctAnswer: 'list[-1]',
+      explanation: 'Negative indexing starts from the end: -1 is last, -2 is second-to-last, etc.',
+      difficulty: 'beginner',
+    },
+    {
+      id: 'py-q7-2',
+      lessonId: 'python-lists',
+      type: 'multiple_choice',
+      question: 'Which method adds an item to the end of a list?',
+      options: ['list.add()', 'list.append()', 'list.push()', 'list.insert()'],
+      correctAnswer: 'list.append()',
+      explanation: 'append() adds an item to the end of a list.',
+      difficulty: 'beginner',
+    },
+    {
+      id: 'py-q7-3',
+      lessonId: 'python-lists',
+      type: 'true_false',
+      question: 'Lists in Python are mutable.',
+      options: ['True', 'False'],
+      correctAnswer: 'True',
+      explanation: 'Lists can be modified after creation - they are mutable.',
+      difficulty: 'beginner',
+    },
+  ],
+  'python-dictionaries': [
+    {
+      id: 'py-q8-1',
+      lessonId: 'python-dictionaries',
+      type: 'multiple_choice',
+      question: 'Which method safely gets a value from a dictionary without raising an error?',
+      options: ['dict[]', 'dict.get()', 'dict.fetch()', 'dict.find()'],
+      correctAnswer: 'dict.get()',
+      explanation: 'dict.get(key, default) returns a default value if the key doesn\'t exist.',
+      difficulty: 'beginner',
+    },
+    {
+      id: 'py-q8-2',
+      lessonId: 'python-dictionaries',
+      type: 'true_false',
+      question: 'Dictionary keys must be unique.',
+      options: ['True', 'False'],
+      correctAnswer: 'True',
+      explanation: 'Each key in a dictionary must be unique; duplicate keys will overwrite previous values.',
+      difficulty: 'beginner',
+    },
+    {
+      id: 'py-q8-3',
+      lessonId: 'python-dictionaries',
+      type: 'multiple_choice',
+      question: 'How do you iterate over both keys and values in a dictionary?',
+      options: ['for k, v in dict:', 'for k, v in dict.items():', 'for k, v in dict.both():', 'for k, v in dict.pairs():'],
+      correctAnswer: 'for k, v in dict.items():',
+      explanation: 'dict.items() returns key-value pairs as tuples.',
+      difficulty: 'beginner',
+    },
+  ],
+  'python-strings': [
+    {
+      id: 'py-q9-1',
+      lessonId: 'python-strings',
+      type: 'multiple_choice',
+      question: 'Which is the modern way to format strings in Python?',
+      options: ['% formatting', 'str.format()', 'f-strings', 'concat()'],
+      correctAnswer: 'f-strings',
+      explanation: 'F-strings (f"...") are the modern, preferred way to format strings in Python 3.6+.',
+      difficulty: 'beginner',
+    },
+    {
+      id: 'py-q9-2',
+      lessonId: 'python-strings',
+      type: 'true_false',
+      question: 'Strings in Python are mutable.',
+      options: ['True', 'False'],
+      correctAnswer: 'False',
+      explanation: 'Strings are immutable - string methods return new strings.',
+      difficulty: 'beginner',
+    },
+    {
+      id: 'py-q9-3',
+      lessonId: 'python-strings',
+      type: 'multiple_choice',
+      question: 'What does "Hello World".split() return?',
+      options: ['"Hello", "World"', '["Hello", "World"]', '("Hello", "World")', '"HelloWorld"'],
+      correctAnswer: '["Hello", "World"]',
+      explanation: 'split() returns a list of words separated by whitespace.',
+      difficulty: 'beginner',
+    },
+  ],
+  'python-file-io': [
+    {
+      id: 'py-q10-1',
+      lessonId: 'python-file-io',
+      type: 'multiple_choice',
+      question: 'What does the "with" statement do when working with files?',
+      options: ['Opens faster', 'Automatically closes the file', 'Compresses the file', 'Encrypts the file'],
+      correctAnswer: 'Automatically closes the file',
+      explanation: 'The with statement ensures files are properly closed even if an error occurs.',
+      difficulty: 'intermediate',
+    },
+    {
+      id: 'py-q10-2',
+      lessonId: 'python-file-io',
+      type: 'multiple_choice',
+      question: 'Which mode opens a file for appending?',
+      options: ['"r"', '"w"', '"a"', '"x"'],
+      correctAnswer: '"a"',
+      explanation: '"a" mode opens a file for appending; new data is added to the end.',
+      difficulty: 'intermediate',
+    },
+    {
+      id: 'py-q10-3',
+      lessonId: 'python-file-io',
+      type: 'true_false',
+      question: 'Opening a file in "w" mode will overwrite existing content.',
+      options: ['True', 'False'],
+      correctAnswer: 'True',
+      explanation: '"w" mode truncates the file, deleting existing content.',
+      difficulty: 'intermediate',
     },
   ],
 };

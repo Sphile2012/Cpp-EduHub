@@ -2,7 +2,9 @@ import { Link } from 'wouter';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, Code2 } from 'lucide-react';
-import { getTermDefinition, type TermDefinition } from '@/data/term-definitions';
+import { getTermDefinition, type TermDefinition } from '@/data/term-definitions-multi';
+import { useLanguage } from '@/hooks/use-language';
+import { DEFAULT_LANGUAGE } from '@/config/languages';
 
 interface ConceptLinkProps {
   term: string;
@@ -11,11 +13,12 @@ interface ConceptLinkProps {
 }
 
 export function ConceptLink({ term, slug, children }: ConceptLinkProps) {
+  const { currentLanguage } = useLanguage();
   const conceptSlug = slug || term.toLowerCase().replace(/\s+/g, '-');
   const displayText = children || term;
   
-  // Get embedded definition
-  const definition = getTermDefinition(term);
+  // Get embedded definition for current language
+  const definition = getTermDefinition(term, currentLanguage || DEFAULT_LANGUAGE);
 
   if (!definition) {
     // Simple link without hover preview
@@ -95,19 +98,48 @@ export function ConceptLink({ term, slug, children }: ConceptLinkProps) {
   );
 }
 
-// Helper function to automatically linkify C++ keywords in HTML text
-export function linkifyContent(htmlText: string): string {
-  // C++ keywords to linkify (sorted by length, longest first to avoid partial matches)
-  const keywords = [
-    'polymorphism', 'encapsulation', 'inheritance', 'constructor', 'destructor',
-    'pointers', 'pointer', 'references', 'reference', 'namespace', 'template',
-    'templates', 'operator', 'operators', 'variable', 'variables', 'function',
-    'functions', 'nullptr', 'virtual', 'override', 'classes', 'class', 'objects',
-    'object', 'vectors', 'vector', 'arrays', 'array', 'string', 'struct',
-    'const', 'static', 'double', 'float', 'char', 'bool', 'void', 'endl',
-    'cout', 'cin', 'std', 'for', 'while', 'switch', 'return', 'loop', 'loops',
-    'map', 'set', 'int', 'new', 'delete', 'if'
-  ].sort((a, b) => b.length - a.length);
+// Helper function to automatically linkify keywords in HTML text (language-aware)
+export function linkifyContent(htmlText: string, language: string = 'cpp'): string {
+  // Get keywords based on language
+  const keywordsByLang: Record<string, string[]> = {
+    cpp: [
+      'polymorphism', 'encapsulation', 'inheritance', 'constructor', 'destructor',
+      'pointers', 'pointer', 'references', 'reference', 'namespace', 'template',
+      'templates', 'operator', 'operators', 'variable', 'variables', 'function',
+      'functions', 'nullptr', 'virtual', 'override', 'classes', 'class', 'objects',
+      'object', 'vectors', 'vector', 'arrays', 'array', 'string', 'struct',
+      'const', 'static', 'double', 'float', 'char', 'bool', 'void', 'endl',
+      'cout', 'cin', 'std', 'for', 'while', 'switch', 'return', 'loop', 'loops',
+      'map', 'set', 'int', 'new', 'delete', 'if'
+    ],
+    python: [
+      'variable', 'variables', 'function', 'functions', 'class', 'classes',
+      'list', 'lists', 'dictionary', 'dictionaries', 'tuple', 'tuples',
+      'for', 'while', 'if', 'elif', 'else', 'def', 'return', 'import',
+      'self', 'loop', 'loops', 'object', 'objects', 'method', 'methods'
+    ],
+    java: [
+      'class', 'classes', 'method', 'methods', 'variable', 'variables',
+      'array', 'arrays', 'interface', 'interfaces', 'public', 'private',
+      'static', 'void', 'int', 'string', 'object', 'objects', 'for', 'while',
+      'if', 'else', 'return', 'new', 'extends', 'implements'
+    ],
+    javascript: [
+      'variable', 'variables', 'function', 'functions', 'arrow function',
+      'array', 'arrays', 'object', 'objects', 'const', 'let', 'var',
+      'promise', 'promises', 'async', 'await', 'for', 'while', 'if',
+      'return', 'class', 'classes', 'method', 'methods'
+    ],
+    typescript: [
+      'type', 'types', 'interface', 'interfaces', 'class', 'classes',
+      'generic', 'generics', 'enum', 'enums', 'union', 'any', 'const',
+      'let', 'var', 'function', 'functions', 'array', 'arrays',
+      'for', 'while', 'if', 'return', 'async', 'await'
+    ]
+  };
+  
+  const keywords = (keywordsByLang[language] || keywordsByLang.cpp)
+    .sort((a, b) => b.length - a.length);
 
   let result = htmlText;
   

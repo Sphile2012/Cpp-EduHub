@@ -1,4 +1,5 @@
 import { useGetGlossary } from "@/hooks/use-static-data";
+import { useLanguage } from "@/hooks/use-language";
 import { Link } from "wouter";
 import { Search, Library, Hash } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -7,6 +8,7 @@ import { Card } from "@/components/ui/card";
 
 export default function GlossaryList() {
   const { data: terms, isLoading } = useGetGlossary();
+  const { languageConfig } = useLanguage();
   const [search, setSearch] = useState("");
 
   const filteredTerms = terms?.filter(t => 
@@ -29,10 +31,10 @@ export default function GlossaryList() {
         <div className="space-y-2">
           <h1 className="text-4xl font-bold font-handwriting text-primary flex items-center gap-3">
             <Library className="w-8 h-8" />
-            C++ Glossary
+            {languageConfig?.displayName || 'Programming'} Glossary
           </h1>
           <p className="text-muted-foreground text-lg">
-            Your technical reference for concepts, keywords, and paradigms.
+            Your technical reference for {languageConfig?.displayName || 'programming'} concepts, keywords, and paradigms.
           </p>
         </div>
         

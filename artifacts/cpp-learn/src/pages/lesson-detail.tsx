@@ -24,7 +24,7 @@ export default function LessonDetail() {
   const lessonId = id || "";
   const { data: lesson, isLoading } = useGetLesson(lessonId);
   const { markLessonComplete, completedLessonIds } = useLocalProgress();
-  const { languageConfig } = useLanguage();
+  const { languageConfig, currentLanguage } = useLanguage();
   
   const [playgroundCode, setPlaygroundCode] = useState<string>("");
   const [showAITutor, setShowAITutor] = useState(false);
@@ -109,7 +109,7 @@ export default function LessonDetail() {
                 
                 {section.type === 'text' && (
                   <div className="prose prose-invert max-w-none text-foreground leading-relaxed" 
-                       dangerouslySetInnerHTML={{ __html: linkifyContent(section.body.replace(/\n/g, '<br/>')) }} />
+                       dangerouslySetInnerHTML={{ __html: linkifyContent(section.body.replace(/\n/g, '<br/>'), currentLanguage || 'cpp') }} />
                 )}
                 
                 {section.type === 'code' && section.code && (

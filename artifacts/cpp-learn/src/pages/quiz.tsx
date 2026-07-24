@@ -1,5 +1,6 @@
 import { useParams, useLocation } from "wouter";
 import { useGetLessonQuiz, useGetLessons } from "@/hooks/use-static-data";
+import { useLanguage } from "@/hooks/use-language";
 import { useState } from "react";
 import { useLocalProgress } from "@/hooks/use-local-progress";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ export default function QuizPage() {
   const { data: questions } = useGetLessonQuiz(lessonId);
   const { data: allLessons } = useGetLessons();
   const { saveQuizScore } = useLocalProgress();
+  const { languageConfig } = useLanguage();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -52,7 +54,7 @@ export default function QuizPage() {
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold mb-4">No Quiz Available</h2>
             <p className="text-muted-foreground mb-6">
-              There is no quiz for this lesson yet. Choose from available quizzes below:
+              There is no quiz for this lesson yet in {languageConfig?.displayName || 'the selected language'}. Choose from available quizzes below:
             </p>
           </div>
 

@@ -7,7 +7,6 @@ import { AppLayout } from '@/components/layout/app-layout';
 import { LanguageProvider, useLanguage } from '@/hooks/use-language';
 import { AuthProvider } from '@/hooks/use-auth';
 import { DEFAULT_LANGUAGE } from '@/config/languages';
-import LanguageSelector from '@/components/language-selector';
 
 // Pages
 import Dashboard from '@/pages/dashboard';
@@ -75,13 +74,13 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <LanguageProvider>
-          <AuthProvider>
+        <AuthProvider>
+          <LanguageProvider>
             <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
               <AppRoutes />
             </WouterRouter>
-          </AuthProvider>
-        </LanguageProvider>
+          </LanguageProvider>
+        </AuthProvider>
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>

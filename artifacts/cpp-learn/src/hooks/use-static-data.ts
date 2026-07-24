@@ -2,11 +2,14 @@
 // This provides the same interface as the API hooks but with instant loading
 
 import { useMemo } from 'react';
-import * as staticData from '@/lib/static-data';
+import { useLanguage } from '@/hooks/use-language';
+import { getLessonsForLanguage, getGlossaryForLanguage, getQuizzesForLanguage } from '@/data/languages';
+import { DEFAULT_LANGUAGE } from '@/config/languages';
 
 export function useGetLessons() {
-  const data = useMemo(() => staticData.getLessons(), []);
-  
+  const { currentLanguage } = useLanguage();
+  const data = useMemo(() => getLessonsForLanguage(currentLanguage ?? DEFAULT_LANGUAGE), [currentLanguage]);
+
   return {
     data,
     isLoading: false,
@@ -15,8 +18,10 @@ export function useGetLessons() {
 }
 
 export function useGetLesson(id: string) {
-  const data = useMemo(() => staticData.getLesson(id), [id]);
-  
+  const { currentLanguage } = useLanguage();
+  const lessons = useMemo(() => getLessonsForLanguage(currentLanguage ?? DEFAULT_LANGUAGE), [currentLanguage]);
+  const data = useMemo(() => lessons.find((lesson) => lesson.id === id), [id, lessons]);
+
   return {
     data,
     isLoading: false,
@@ -25,8 +30,9 @@ export function useGetLesson(id: string) {
 }
 
 export function useGetGlossary() {
-  const data = useMemo(() => staticData.getGlossary(), []);
-  
+  const { currentLanguage } = useLanguage();
+  const data = useMemo(() => getGlossaryForLanguage(currentLanguage ?? DEFAULT_LANGUAGE), [currentLanguage]);
+
   return {
     data,
     isLoading: false,
@@ -35,8 +41,10 @@ export function useGetGlossary() {
 }
 
 export function useGetGlossaryTerm(slug: string) {
-  const data = useMemo(() => staticData.getGlossaryTerm(slug), [slug]);
-  
+  const { currentLanguage } = useLanguage();
+  const glossary = useMemo(() => getGlossaryForLanguage(currentLanguage ?? DEFAULT_LANGUAGE), [currentLanguage]);
+  const data = useMemo(() => glossary.find((term) => term.slug === slug), [glossary, slug]);
+
   return {
     data,
     isLoading: false,
@@ -45,8 +53,10 @@ export function useGetGlossaryTerm(slug: string) {
 }
 
 export function useGetLessonQuiz(lessonId: string) {
-  const data = useMemo(() => staticData.getQuizForLesson(lessonId), [lessonId]);
-  
+  const { currentLanguage } = useLanguage();
+  const quizzes = useMemo(() => getQuizzesForLanguage(currentLanguage ?? DEFAULT_LANGUAGE), [currentLanguage]);
+  const data = useMemo(() => quizzes.find((quiz) => quiz.id === `quiz-${lessonId}`)?.questions ?? [], [lessonId, quizzes]);
+
   return {
     data,
     isLoading: false,

@@ -4,6 +4,14 @@
 
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced';
 
+export interface LessonSection {
+  heading?: string | null;
+  body: string;
+  type: 'text' | 'note' | 'warning' | 'tip' | 'code';
+  code?: string | null;
+  language?: string | null;
+}
+
 export interface LessonData {
   id: string;
   title: string;
@@ -11,11 +19,15 @@ export interface LessonData {
   order: number;
   difficulty: Difficulty;
   estimatedMinutes: number;
-  content: string;
+  content: LessonSection[] | string;
   codeExamples: CodeExample[];
   quizQuestions: QuizQuestion[];
   prerequisites: string[];
   learningObjectives: string[];
+  topics: string[];
+  keyPoints: string[];
+  nextLessonId?: string | null;
+  prevLessonId?: string | null;
 }
 
 export interface CodeExample {
@@ -25,6 +37,7 @@ export interface CodeExample {
   explanation: string;
   language?: string;
   output?: string;
+  runnable?: boolean;
 }
 
 export interface QuizQuestion {

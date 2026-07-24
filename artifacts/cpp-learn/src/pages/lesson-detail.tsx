@@ -1,5 +1,6 @@
 import { useParams, Link, useLocation } from "wouter";
 import { useGetLesson } from "@/hooks/use-static-data";
+import { useLanguage } from "@/hooks/use-language";
 import { PlaygroundPanel } from "@/components/playground/playground-panel";
 import { SimpleSyntaxHighlighter } from "@/components/ui/syntax-highlighter";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ import { linkifyContent } from "@/components/concept-explorer/concept-link";
 import { LoopVisualizer } from "@/components/visualizer/loop-visualizer";
 import { MemoryVisualizer } from "@/components/visualizer/memory-visualizer";
 import { AIChat } from "@/components/ai-tutor/ai-chat";
+import type { LessonSection } from "@/data/languages/types";
 
 export default function LessonDetail() {
   const { id } = useParams<{ id: string }>();
@@ -22,6 +24,7 @@ export default function LessonDetail() {
   const lessonId = id || "";
   const { data: lesson, isLoading } = useGetLesson(lessonId);
   const { markLessonComplete, completedLessonIds } = useLocalProgress();
+  const { languageConfig } = useLanguage();
   
   const [playgroundCode, setPlaygroundCode] = useState<string>("");
   const [showAITutor, setShowAITutor] = useState(false);
@@ -44,6 +47,10 @@ export default function LessonDetail() {
   const loadExampleIntoPlayground = (code: string) => {
     setPlaygroundCode(code);
   };
+
+  const sections: LessonSection[] = Array.isArray(lesson.content)
+    ? lesson.content
+    : [{ type: 'text', body: String(lesson.content) }];
 
   return (
     <div className="h-screen flex flex-col md:flex-row overflow-hidden bg-background">
@@ -87,12 +94,12 @@ export default function LessonDetail() {
             {/* Lesson Intro */}
             <div className="space-y-4">
               <p className="text-xl text-muted-foreground leading-relaxed">
-                {lesson.description}
+                {lesson.description} <span className="text-sm text-primary">({languageConfig?.displayName || 'selected language'})</span>
               </p>
             </div>
 
             {/* Lesson Sections */}
-            {lesson.content.map((section, idx) => (
+            {sections.map((section, idx) => (
               <div key={idx} className="space-y-4">
                 {section.heading && (
                   <h2 className="text-2xl font-bold font-handwriting text-primary border-b pb-2 mt-8">
@@ -253,13 +260,13 @@ export default function LessonDetail() {
             )}
 
             {/* Key Points Summary */}
-            {lesson.keyPoints.length > 0 && (
+            {(lesson.keyPoints?.length ?? 0) > 0 && (
               <div className="mt-12 p-6 bg-card border rounded-xl">
                 <h3 className="font-handwriting text-xl font-bold mb-4 flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-primary" /> Key Takeaways
                 </h3>
                 <ul className="space-y-2">
-                  {lesson.keyPoints.map((point, i) => (
+                  {lesson.keyPoints?.map((point, i) => (
                     <li key={i} className="flex gap-3 text-muted-foreground">
                       <span className="text-primary mt-1">•</span>
                       <span>{point}</span>
@@ -311,7 +318,7 @@ export default function LessonDetail() {
             lessonContext={{
               lessonId: lesson.id,
               lessonTitle: lesson.title,
-              currentTopic: lesson.keyPoints[0]
+              currentTopic: lesson.keyPoints?.[0] ?? lesson.title
             }}
             codeContext={playgroundCode}
             onInsertCode={(code) => setPlaygroundCode(code)}

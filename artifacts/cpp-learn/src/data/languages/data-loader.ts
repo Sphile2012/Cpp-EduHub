@@ -7,7 +7,7 @@
  */
 
 import type { LanguageId } from '@/config/languages';
-import type { LanguageContent, LessonData, GlossaryTermData, QuizData } from './types';
+import type { LanguageContent, LessonData, GlossaryTermData, QuizData, LessonSection } from './types';
 import { glossaryTerms as cppGlossaryTerms, lessons as cppLessons, quizzes as cppQuizzes } from '@/lib/static-data';
 import { pythonLessons, pythonGlossary, pythonQuizzes } from './python-content';
 
@@ -70,24 +70,98 @@ export function getQuizzesForLanguage(language: LanguageId): QuizData[] {
   return getLanguageContent(language).quizzes;
 }
 
-/**
- * Get C++ content (using existing data)
- */
-function getCppContent(): LanguageContent {
-  // Convert existing C++ data to new format
-  const lessons: LessonData[] = (cppLessons || []).map((lesson: any) => ({
+function normalizeLessonData(lesson: Partial<LessonData> & Pick<LessonData, 'id' | 'title' | 'description' | 'order' | 'difficulty' | 'estimatedMinutes'>, index: number, total: number): LessonData {
+  const content = Array.isArray(lesson.content)
+    ? lesson.content
+    : normalizeLessonContent(String(lesson.content ?? ''));
+
+  const topics = lesson.topics ?? lesson.learningObjectives?.slice(0, 3) ?? ['basics'];
+  const keyPoints = lesson.keyPoints ?? (lesson.learningObjectives?.length ? lesson.learningObjectives.slice(0, 4) : [lesson.description]);
+
+  return {
     id: lesson.id,
     title: lesson.title,
     description: lesson.description,
     order: lesson.order,
     difficulty: lesson.difficulty,
     estimatedMinutes: lesson.estimatedMinutes,
+    content,
+    codeExamples: (lesson.codeExamples ?? []).map((example) => ({
+      ...example,
+      runnable: example.runnable ?? true,
+    })),
+    quizQuestions: lesson.quizQuestions ?? [],
+    prerequisites: lesson.prerequisites ?? [],
+    learningObjectives: lesson.learningObjectives ?? [],
+    topics,
+    keyPoints,
+    nextLessonId: lesson.nextLessonId ?? (index < total - 1 ? undefined : null),
+    prevLessonId: lesson.prevLessonId ?? (index > 0 ? undefined : null),
+  };
+}
+
+function normalizeLessonContent(content: string): LessonSection[] {
+  const trimmed = content.replace(/\r\n/g, '\n').trim();
+  if (!trimmed) {
+    return [{ type: 'text', body: 'No content available yet.' }];
+  }
+
+  const sections: LessonSection[] = [];
+  const lines = trimmed.split('\n');
+  let currentHeading: string | null = null;
+  let currentBody: string[] = [];
+
+  const flush = () => {
+    const body = currentBody.join('\n').trim();
+    if (body) {
+      sections.push({
+        type: 'text',
+        heading: currentHeading ?? undefined,
+        body,
+      });
+    }
+  };
+
+  lines.forEach((line) => {
+    if (/^##\s+/.test(line)) {
+      flush();
+      currentHeading = line.replace(/^##\s+/, '').trim();
+      currentBody = [];
+      return;
+    }
+
+    if (/^#\s+/.test(line)) {
+      flush();
+      currentHeading = line.replace(/^#\s+/, '').trim();
+      currentBody = [];
+      return;
+    }
+
+    currentBody.push(line);
+  });
+
+  flush();
+
+  return sections.length > 0 ? sections : [{ type: 'text', body: trimmed }];
+}
+
+/**
+ * Get C++ content (using existing data)
+ */
+function getCppContent(): LanguageContent {
+  // Convert existing C++ data to new format
+  const lessons: LessonData[] = (cppLessons || []).map((lesson: any, index: number) => normalizeLessonData({
+    ...lesson,
     content: lesson.content || '',
     codeExamples: lesson.codeExamples || [],
     quizQuestions: lesson.quizQuestions || [],
     prerequisites: lesson.prerequisites || [],
     learningObjectives: lesson.learningObjectives || [],
-  }));
+    topics: lesson.topics || [],
+    keyPoints: lesson.keyPoints || [],
+    nextLessonId: lesson.nextLessonId,
+    prevLessonId: lesson.prevLessonId,
+  }, index, cppLessons.length));
 
   const glossary: GlossaryTermData[] = cppGlossaryTerms || [];
 
@@ -117,7 +191,7 @@ function getCppContent(): LanguageContent {
  * Get Python content
  */
 function getPythonContent(): LanguageContent {
-  const lessons: LessonData[] = pythonLessons;
+  const lessons: LessonData[] = pythonLessons.map((lesson, index) => normalizeLessonData(lesson, index, pythonLessons.length));
   const glossary: GlossaryTermData[] = pythonGlossary;
   
   // Convert pythonQuizzes Record to QuizData[]
@@ -187,6 +261,8 @@ function getPlaceholderLessons(language: string, displayName: string): LessonDat
         'Write your first Hello World program',
         'Understand basic syntax',
       ],
+      topics: ['intro', 'basics'],
+      keyPoints: [`Understand what ${displayName} is used for`, 'Write your first program'],
     },
     {
       id: `${language}-variables`,
@@ -204,6 +280,8 @@ function getPlaceholderLessons(language: string, displayName: string): LessonDat
         'Understand different data types',
         'Use type conversion',
       ],
+      topics: ['variables', 'data'],
+      keyPoints: ['Declare variables', 'Store and read data'],
     },
     {
       id: `${language}-operators`,
@@ -221,6 +299,8 @@ function getPlaceholderLessons(language: string, displayName: string): LessonDat
         'Use comparison operators',
         'Use logical operators',
       ],
+      topics: ['operators', 'expressions'],
+      keyPoints: ['Use arithmetic operators', 'Compare values'],
     },
     {
       id: `${language}-conditionals`,
@@ -238,6 +318,8 @@ function getPlaceholderLessons(language: string, displayName: string): LessonDat
         'Use else and else-if',
         'Use switch statements',
       ],
+      topics: ['conditions', 'logic'],
+      keyPoints: ['Branch your code', 'Handle multiple conditions'],
     },
     {
       id: `${language}-loops`,
@@ -255,6 +337,8 @@ function getPlaceholderLessons(language: string, displayName: string): LessonDat
         'Use while loops',
         'Use loop control statements',
       ],
+      topics: ['loops', 'iteration'],
+      keyPoints: ['Repeat work with loops', 'Control loop execution'],
     },
   ];
 }

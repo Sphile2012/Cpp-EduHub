@@ -24,7 +24,7 @@ export default function RoadmapPage() {
   }
 
   const groupedLessons = lessons?.reduce((acc, lesson) => {
-    const category = lesson.topics[0] || 'General';
+    const category = lesson.topics?.[0] || 'General';
     if (!acc[category]) acc[category] = [];
     acc[category].push(lesson);
     return acc;
@@ -143,14 +143,14 @@ export default function RoadmapPage() {
                           <p className="text-muted-foreground">{lesson.description}</p>
 
                           <div className="flex flex-wrap gap-2 pt-2">
-                            {lesson.topics.slice(0, 3).map((topic) => (
+                            {(lesson.topics ?? []).slice(0, 3).map((topic) => (
                               <Badge key={topic} variant="secondary" className="text-xs">
                                 {topic}
                               </Badge>
                             ))}
-                            {lesson.topics.length > 3 && (
+                            {(lesson.topics ?? []).length > 3 && (
                               <Badge variant="secondary" className="text-xs">
-                                +{lesson.topics.length - 3} more
+                                +{(lesson.topics ?? []).length - 3} more
                               </Badge>
                             )}
                           </div>

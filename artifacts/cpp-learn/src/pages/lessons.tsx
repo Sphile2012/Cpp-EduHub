@@ -1,5 +1,6 @@
 import { useGetLessons } from "@/hooks/use-static-data";
 import { useLocalProgress } from "@/hooks/use-local-progress";
+import { useLanguage } from "@/hooks/use-language";
 import { Link } from "wouter";
 import { BookOpen, CheckCircle2, Clock, Signal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +11,7 @@ import { motion } from "framer-motion";
 export default function LessonBrowser() {
   const { data: lessons, isLoading } = useGetLessons();
   const { completedLessonIds, getMergedProgress } = useLocalProgress();
+  const { languageConfig } = useLanguage();
   const progress = getMergedProgress();
   
   const [filter, setFilter] = useState<string>("all");
@@ -28,7 +30,7 @@ export default function LessonBrowser() {
             Curriculum
           </h1>
           <p className="text-muted-foreground text-lg">
-            Master C++ from memory management to object-oriented design.
+            Master {languageConfig?.displayName || 'your selected language'} with practical lessons and examples.
           </p>
         </div>
         
@@ -108,7 +110,7 @@ export default function LessonBrowser() {
                     </div>
                     <p className="text-muted-foreground mb-4">{lesson.description}</p>
                     <div className="flex flex-wrap gap-2">
-                      {lesson.topics.map(topic => (
+                      {(lesson.topics ?? []).map(topic => (
                         <span key={topic} className="text-xs bg-muted/50 text-muted-foreground px-2 py-1 rounded-md border">
                           #{topic}
                         </span>

@@ -48,6 +48,8 @@ Python is a high-level, interpreted programming language known for its simplicit
       'Know the main uses of Python',
       'Write your first Python program',
     ],
+    topics: ['python', 'basics', 'history'],
+    keyPoints: ['Python is beginner-friendly', 'It is used across many domains'],
   },
   {
     id: 'python-variables',
@@ -102,6 +104,8 @@ print("Hobbies:", hobbies)`,
       'Understand different data types',
       'Use type() to check variable types',
     ],
+    topics: ['variables', 'data types', 'typing'],
+    keyPoints: ['Variables store values', 'Python infers types automatically'],
   },
   {
     id: 'python-operators',
@@ -170,6 +174,8 @@ print(not x)    # False`,
       'Use comparison operators',
       'Use logical operators',
     ],
+    topics: ['operators', 'expressions', 'logic'],
+    keyPoints: ['Operators perform calculations', 'Comparisons return booleans'],
   },
   {
     id: 'python-conditionals',
@@ -244,6 +250,8 @@ else:
       'Write if-else statements',
       'Write if-elif-else statements',
     ],
+    topics: ['conditionals', 'decision making', 'control flow'],
+    keyPoints: ['Conditionals choose between paths', 'Indentation defines blocks'],
   },
   {
     id: 'python-loops',
@@ -313,6 +321,8 @@ for i in range(10):
       'Write while loops',
       'Use break and continue',
     ],
+    topics: ['loops', 'iteration', 'repetition'],
+    keyPoints: ['Loops repeat code', 'Break and continue control execution'],
   },
   {
     id: 'python-functions',
@@ -377,6 +387,8 @@ print(f"Min: {minimum}, Max: {maximum}, Avg: {average}")`,
       'Use parameters and return values',
       'Use default parameters',
     ],
+    topics: ['functions', 'reuse', 'abstraction'],
+    keyPoints: ['Functions group reusable logic', 'Parameters make functions flexible'],
   },
 ];
 

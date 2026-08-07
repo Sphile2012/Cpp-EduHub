@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 export default function LoginPage() {
-  const { login, loginWithGoogle } = useAuth();
+  const { login } = useAuth();
   const [, navigate] = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,17 +29,7 @@ export default function LoginPage() {
     setIsLoading(false);
   };
 
-  const handleGoogle = async () => {
-    setIsLoading(true);
-    setError(null);
-    const result = await loginWithGoogle();
-    if (result.success) {
-      navigate('/dashboard');
-    } else {
-      setError(result.error || 'Google sign-in failed');
-    }
-    setIsLoading(false);
-  };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
@@ -48,7 +38,7 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold text-white">Welcome back</h1>
           <p className="mt-2 text-sm text-slate-400">Sign in to continue learning.</p>
         </div>
-        {error ? <div className="mb-4 rounded-lg border border-red-700/40 bg-red-950/40 p-3 text-sm text-red-300">{error}</div> : null}
+        {error && !error.toLowerCase().includes('google') ? <div className="mb-4 rounded-lg border border-red-700/40 bg-red-950/40 p-3 text-sm text-red-300">{error}</div> : null}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="email" className="mb-2 block text-white">Email</Label>
@@ -72,16 +62,6 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <div className="my-4 flex items-center gap-3">
-          <div className="h-px flex-1 bg-slate-700" />
-          <span className="text-xs uppercase tracking-[0.3em] text-slate-500">or</span>
-          <div className="h-px flex-1 bg-slate-700" />
-        </div>
-
-        <Button type="button" variant="outline" onClick={handleGoogle} disabled={isLoading} className="h-12 w-full border-slate-700 bg-slate-950 text-white hover:bg-slate-800">
-          {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-          Continue with Google
-        </Button>
 
         <p className="mt-6 text-center text-sm text-slate-400">
           Don’t have an account?{' '}

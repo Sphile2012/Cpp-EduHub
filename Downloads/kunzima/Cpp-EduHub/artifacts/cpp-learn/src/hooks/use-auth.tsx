@@ -2,7 +2,19 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { useToast } from '@/hooks/use-toast';
 import { DEFAULT_LANGUAGE, normalizeLanguageId, type LanguageId } from '@/config/languages';
 import { useLanguage } from '@/hooks/use-language';
-import { getCurrentSession, loginUser, loginWithGoogle, logoutUser, signupUser, updateUserProfile } from '@/lib/auth-service';
+import { 
+  getCurrentSession, 
+  loginUser, 
+  loginWithGoogle, 
+  logoutUser, 
+  signupUser, 
+  updateUserProfile,
+  resetPassword,
+  updatePassword,
+  uploadAvatar,
+  resendVerificationEmail,
+  onAuthStateChange
+} from '@/lib/auth-service';
 
 export interface UserProfile {
   id: string;
@@ -39,12 +51,16 @@ interface AuthContextType {
   user: UserProfile | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  signup: (email: string, password: string, name: string, username: string) => Promise<{ success: boolean; error?: string }>;
+  signup: (email: string, password: string, name: string, username: string) => Promise<{ success: boolean; error?: string; needsEmailConfirmation?: boolean }>;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  loginWithGoogle: () => Promise<{ success: boolean; error?: string }>;
+  loginWithGoogle: () => Promise<{ success: boolean; error?: string; redirecting?: boolean }>;
   logout: () => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ success: boolean; error?: string }>;
   refreshProfile: () => Promise<void>;
+  resetPassword: (email: string) => Promise<{ success: boolean; error?: string; message?: string }>;
+  updatePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; error?: string; message?: string }>;
+  uploadAvatar: (file: File) => Promise<{ success: boolean; error?: string; avatarUrl?: string | null }>;
+  resendVerificationEmail: (email: string) => Promise<{ success: boolean; error?: string; message?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -56,29 +72,67 @@ export function useAuthProvider() {
   const { setLanguage } = useLanguage();
 
   useEffect(() => {
-    const session = getCurrentSession();
-    if (session?.user) {
-      setUser(session.user as UserProfile);
-      const lang = normalizeLanguageId(session.user.preferred_language as LanguageId);
-      if (lang) setLanguage(lang);
-    }
-    setIsLoading(false);
+    const loadSession = async () => {
+      try {
+        const session = await getCurrentSession();
+        if (session?.user) {
+          setUser(session.user as UserProfile);
+          const lang = normalizeLanguageId(session.user.preferred_language as LanguageId);
+          if (lang) setLanguage(lang);
+        }
+      } catch (error) {
+        console.error('Error loading session:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadSession();
+
+    // Listen for auth state changes
+    const { data: { subscription } } = onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        // Fetch full profile on sign in
+        const sessionData = await getCurrentSession();
+        if (sessionData?.user) {
+          setUser(sessionData.user as UserProfile);
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [setLanguage]);
 
   const signup = useCallback(async (email: string, password: string, name: string, username: string) => {
-    const result = signupUser({ email, password, name, username });
+    const result = await signupUser({ email, password, name, username });
     if (result.success && result.user) {
       setUser(result.user);
       const lang = normalizeLanguageId(result.user.preferred_language as LanguageId);
       if (lang) setLanguage(lang);
-      toast({ title: 'Account created', description: 'You are signed in and ready to explore.' });
-      return { success: true };
+      
+      if (result.needsEmailConfirmation) {
+        toast({ 
+          title: 'Account created', 
+          description: 'Please check your email to verify your account.',
+          variant: 'default'
+        });
+      } else {
+        toast({ 
+          title: 'Account created', 
+          description: 'You are signed in and ready to explore.' 
+        });
+      }
+      
+      return { success: true, needsEmailConfirmation: result.needsEmailConfirmation };
     }
     return { success: false, error: result.error };
   }, [setLanguage, toast]);
 
   const login = useCallback(async (email: string, password: string) => {
-    const result = loginUser({ email, password });
+    const result = await loginUser({ email, password });
     if (result.success && result.user) {
       setUser(result.user);
       const lang = normalizeLanguageId(result.user.preferred_language as LanguageId);
@@ -90,7 +144,7 @@ export function useAuthProvider() {
   }, [setLanguage, toast]);
 
   const loginWithGoogleHandler = useCallback(async () => {
-    const result = loginWithGoogle();
+    const result = await loginWithGoogle();
     if (result.success && result.user) {
       setUser(result.user);
       const lang = normalizeLanguageId(result.user.preferred_language as LanguageId);
@@ -98,18 +152,21 @@ export function useAuthProvider() {
       toast({ title: 'Signed in with Google', description: 'You are ready to continue.' });
       return { success: true };
     }
+    if (result.redirecting) {
+      return { success: true, redirecting: true };
+    }
     return { success: false, error: result.error };
   }, [setLanguage, toast]);
 
   const logout = useCallback(async () => {
-    logoutUser();
+    await logoutUser();
     setUser(null);
     toast({ title: 'Signed out', description: 'You have been logged out.' });
   }, [toast]);
 
   const updateProfile = useCallback(async (updates: Partial<UserProfile>) => {
     if (!user) return { success: false, error: 'Not authenticated.' };
-    const result = updateUserProfile({ currentUser: user, updates });
+    const result = await updateUserProfile({ currentUser: user, updates });
     if (result.success && result.user) {
       setUser(result.user);
       const lang = normalizeLanguageId(result.user.preferred_language as LanguageId);
@@ -121,9 +178,50 @@ export function useAuthProvider() {
   }, [setLanguage, toast, user]);
 
   const refreshProfile = useCallback(async () => {
-    const session = getCurrentSession();
+    const session = await getCurrentSession();
     if (session?.user) setUser(session.user as UserProfile);
   }, []);
+
+  const resetPasswordHandler = useCallback(async (email: string) => {
+    const result = await resetPassword({ email });
+    if (result.success) {
+      toast({ 
+        title: 'Reset email sent', 
+        description: result.message || 'Check your email for the reset link.' 
+      });
+      return { success: true, message: result.message };
+    }
+    return { success: false, error: result.error };
+  }, [toast]);
+
+  const updatePasswordHandler = useCallback(async (currentPassword: string, newPassword: string) => {
+    const result = await updatePassword({ currentPassword, newPassword });
+    if (result.success) {
+      toast({ title: 'Password updated', description: result.message || 'Your password has been changed.' });
+      return { success: true, message: result.message };
+    }
+    return { success: false, error: result.error };
+  }, [toast]);
+
+  const uploadAvatarHandler = useCallback(async (file: File) => {
+    if (!user) return { success: false, error: 'Not authenticated.', avatarUrl: null };
+    const result = await uploadAvatar({ currentUser: user, file });
+    if (result.success && result.avatarUrl) {
+      setUser(prev => prev ? { ...prev, avatar: result.avatarUrl } : null);
+      toast({ title: 'Avatar updated', description: 'Your profile picture has been changed.' });
+      return { success: true, avatarUrl: result.avatarUrl };
+    }
+    return { success: false, error: result.error, avatarUrl: null };
+  }, [toast, user]);
+
+  const resendVerificationEmailHandler = useCallback(async (email: string) => {
+    const result = await resendVerificationEmail({ email });
+    if (result.success) {
+      toast({ title: 'Verification email sent', description: result.message || 'Check your email to verify your account.' });
+      return { success: true, message: result.message };
+    }
+    return { success: false, error: result.error };
+  }, [toast]);
 
   const value = useMemo(() => ({
     user,
@@ -135,7 +233,24 @@ export function useAuthProvider() {
     logout,
     updateProfile,
     refreshProfile,
-  }), [isLoading, login, loginWithGoogleHandler, logout, signup, updateProfile, user, refreshProfile]);
+    resetPassword: resetPasswordHandler,
+    updatePassword: updatePasswordHandler,
+    uploadAvatar: uploadAvatarHandler,
+    resendVerificationEmail: resendVerificationEmailHandler,
+  }), [
+    isLoading, 
+    login, 
+    loginWithGoogleHandler, 
+    logout, 
+    signup, 
+    updateProfile, 
+    user, 
+    refreshProfile,
+    resetPasswordHandler,
+    updatePasswordHandler,
+    uploadAvatarHandler,
+    resendVerificationEmailHandler,
+  ]);
 
   return value;
 }
@@ -144,7 +259,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const auth = useAuthProvider();
 
   if (auth.isLoading) {
-    return <div className="min-h-screen flex items-center justify-center bg-slate-950 text-slate-300">Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-950 text-slate-300">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;

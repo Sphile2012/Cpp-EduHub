@@ -124,4 +124,8 @@ export function clearStoredAuthData() {
   const storage = getStorage();
   storage.removeItem(STORAGE_KEYS.session);
   storage.removeItem(STORAGE_KEYS.users);
+  // Also clear JWT token keys used by the backend-connected auth service
+  storage.removeItem('infinity-auth-token');
+  storage.removeItem('infinity-auth-refresh-token');
+  storage.removeItem('infinity-auth-user');
 }

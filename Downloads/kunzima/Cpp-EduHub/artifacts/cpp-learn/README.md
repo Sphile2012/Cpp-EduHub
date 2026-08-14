@@ -1,71 +1,60 @@
-# Cpp-EduHub Authentication System
+# Infinity Code - Frontend Application
 
-A complete authentication system for the Cpp-EduHub learning platform, built with React, TypeScript, and Supabase (with localStorage fallback).
+A modern, full-featured coding education platform built with React, TypeScript, Vite, and Tailwind CSS. Connects to a custom Express.js backend API for authentication, courses, quizzes, community, and more.
 
 ## Features
 
-### ✅ Implemented Features
+### Authentication & User Management
+- Email/password registration and login via Express backend
+- JWT-based authentication with refresh tokens
+- Password reset flow (forgot password → reset password)
+- Protected routes for authenticated users
+- User profile management with avatar upload
+- Settings page with account, security, appearance, notifications, and privacy tabs
 
-1. **User Registration (Sign Up)**
-   - Full form validation
-   - Email verification support
-   - Password strength indicator
-   - Google Sign-Up option
+### Learning & Courses
+- Learning Hub with structured learning paths
+- Lesson browser and detailed lesson views
+- Interactive quizzes with multiple question types
+- Flashcards for revision
+- Glossary of programming terms
+- Progress tracking dashboard
 
-2. **User Login (Sign In)**
-   - Email/password authentication
-   - Google Sign-In integration
-   - Session persistence
-   - "Remember me" functionality
+### Coding & Practice
+- Interactive code playground
+- Coding challenges with difficulty levels and categories
+- Projects hub for building and showcasing real-world projects
+- AI tutor for personalised learning assistance
+- AI study planner
 
-3. **Google Authentication**
-   - OAuth 2.0 integration via Supabase
-   - Automatic user creation
-   - Profile picture from Google
+### Community & Gamification
+- Community forum with discussions, questions, showcases, and tutorials
+- Leaderboard with weekly, monthly, and all-time rankings
+- Achievements and badges system
+- Resources library (documentation, cheat sheets, tutorials)
 
-4. **Forgot Password**
-   - Email-based password reset
-   - Secure reset links
-   - Token validation
+### Admin
+- Admin dashboard for platform management
+- Subscription and payment management
+- Payment history tracking
 
-5. **Password Reset**
-   - Secure password update
-   - Password strength validation
-   - Confirmation matching
+## Tech Stack
 
-6. **Email Verification**
-   - Verification email on signup
-   - Resend verification option
-   - Email verification status display
+- **Framework**: React 18 with TypeScript
+- **Build Tool**: Vite 5
+- **Styling**: Tailwind CSS 3
+- **Routing**: Wouter
+- **State Management**: React Context + TanStack React Query
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+- **HTTP**: Fetch API with JWT auth
 
-7. **User Profile Management**
-   - Update personal information
-   - Upload/change profile picture
-   - Change password functionality
-   - View email verification status
-
-8. **Session Management**
-   - Persistent sessions
-   - Auto-renewal
-   - Secure logout
-
-9. **Route Protection**
-   - Protected routes for authenticated users
-   - Public routes redirect authenticated users
-   - Loading states during auth checks
-
-10. **Form Validation & Error Handling**
-    - Client-side validation
-    - User-friendly error messages
-    - Success notifications
-    - Loading states
-
-## Setup Instructions
+## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ and npm/pnpm
-- A Supabase account (for production) OR use localStorage fallback mode
+- Node.js 18+ and npm
+- Backend API server running (see `server/` directory)
 
 ### 1. Install Dependencies
 
@@ -82,41 +71,27 @@ Copy the example environment file:
 cp .env.example .env
 ```
 
-#### Option A: Using Supabase (Recommended for Production)
-
-1. Create a new Supabase project at [supabase.com](https://supabase.com)
-2. Go to Project Settings > API
-3. Copy your project URL and anon key to `.env`:
+Configure `.env`:
 
 ```env
-VITE_SUPABASE_URL=your-project-url
-VITE_SUPABASE_ANON_KEY=your-anon-key
-```
+# API Configuration
+VITE_API_URL=http://localhost:5000
 
-4. Enable Google OAuth in Supabase:
-   - Go to Authentication > Providers
-   - Enable Google
-   - Add your Google OAuth credentials
-   - Add your site URL to authorized domains
-
-#### Option B: LocalStorage Fallback (Development/Demo)
-
-Leave the environment variables empty:
-
-```env
+# Supabase Configuration (optional - only needed for file storage)
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
+
+# Admin email (optional - designates the primary admin account)
+VITE_ADMIN_EMAIL=
 ```
 
-The app will use localStorage for authentication, perfect for development and testing.
-
-### 3. Run the Development Server
+### 3. Start the Development Server
 
 ```bash
 npm run dev
 ```
 
-The app will be available at `http://localhost:3000`
+The app will be available at `http://localhost:5173`
 
 ### 4. Build for Production
 
@@ -125,236 +100,168 @@ npm run build
 npm run preview
 ```
 
-## Supabase Database Setup
+## Running Both Frontend and Backend
 
-If using Supabase, you'll need to set up the database schema:
+From the project root directory:
 
-### 1. Create the profiles table
+```bash
+# Install all dependencies
+npm run install:all
 
-```sql
--- Create profiles table
-create table public.profiles (
-  id uuid references auth.users on delete cascade not null primary key,
-  email text unique not null,
-  name text,
-  username text unique,
-  avatar text,
-  bio text,
-  phone_number text,
-  country text,
-  learning_goals text,
-  created_at timestamp with time zone default timezone('utc') not null,
-  updated_at timestamp with time zone default timezone('utc') not null,
-  last_login timestamp with time zone,
-  preferred_language text default 'en',
-  role text default 'user',
-  email_verified boolean default false,
-  theme text default 'system',
-  notifications_enabled boolean default true,
-  subscription_status text default 'free',
-  subscription_expires_at timestamp with time zone,
-  courses_enrolled integer default 0,
-  courses_completed integer default 0,
-  lessons_completed integer default 0,
-  certificates_earned integer default 0,
-  streak integer default 0,
-  achievements_unlocked integer default 0,
-  projects_completed integer default 0,
-  total_xp integer default 0,
-  quizzes_passed integer default 0
-);
+# Start both server and client concurrently
+npm run dev
 
--- Enable Row Level Security
-alter table public.profiles enable row level security;
-
--- Create policies
-create policy "Public profiles are viewable by everyone" on public.profiles
-  for select using (true);
-
-create policy "Users can insert their own profile" on public.profiles
-  for insert with check (auth.uid() = id);
-
-create policy "Users can update their own profile" on public.profiles
-  for update using (auth.uid() = id);
+# Build both for production
+npm run build
 ```
-
-### 2. Create a function to handle new user creation
-
-```sql
--- Function to handle new user signup
-create or replace function public.handle_new_user()
-returns trigger as $$
-begin
-  insert into public.profiles (id, email, name, username, role, email_verified)
-  values (
-    new.id,
-    new.email,
-    new.raw_user_meta_data->>'name',
-    new.raw_user_meta_data->>'username',
-    case when new.email = 'poomeigh503@gmail.com' then 'admin' else 'user' end,
-    false
-  );
-  return new;
-end;
-$$ language plpgsql security definer;
-
--- Trigger for user creation
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute procedure public.handle_new_user();
-```
-
-### 3. Set up storage for avatars (optional)
-
-1. Go to Storage in Supabase dashboard
-2. Create a new bucket called `avatars`
-3. Set it to public
-4. Add storage policies:
-
-```sql
--- Allow users to upload their own avatar
-create policy "Users can upload their own avatar" on storage.objects
-  for insert with check (bucket_id = 'avatars' and auth.uid()::text = (storage.foldername(name))[1]);
-
--- Allow public read access
-create policy "Avatar images are publicly accessible" on storage.objects
-  for select using (bucket_id = 'avatars');
-```
-
-## Google OAuth Configuration
-
-### For Supabase:
-
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select existing
-3. Enable Google+ API
-4. Create OAuth 2.0 credentials
-5. Add authorized redirect URI: `https://your-project-id.supabase.co/auth/v1/callback`
-6. Copy Client ID and Client Secret to Supabase Authentication > Providers > Google
-
-### For Development (localStorage mode):
-
-Google Sign-In will create a simulated Google user in localStorage. No configuration needed.
 
 ## Project Structure
 
 ```
 src/
 ├── components/
-│   ├── ui/              # Reusable UI components
+│   ├── layout/
+│   │   └── app-layout.tsx     # Main layout with navigation
+│   ├── ui/                    # Reusable UI components
 │   │   ├── button.tsx
+│   │   ├── card.tsx
 │   │   ├── input.tsx
-│   │   ├── label.tsx
-│   │   └── textarea.tsx
-│   └── ProtectedRoute.tsx
-├── hooks/
-│   ├── use-auth.tsx     # Authentication context & provider
-│   ├── use-toast.tsx    # Toast notifications
-│   └── use-language.tsx # Language preferences
-├── lib/
-│   ├── auth-service.js  # Authentication service functions
-│   ├── auth-utils.js    # Utility functions for auth
-│   ├── supabase.ts      # Supabase client configuration
-│   └── utils.ts         # General utilities
-├── pages/
-│   ├── login.tsx        # Login page
-│   ├── signup.tsx       # Registration page
-│   ├── profile.tsx      # User profile page
-│   ├── forgot-password.tsx
-│   └── reset-password.tsx
+│   │   ├── badge.tsx
+│   │   ├── progress.tsx
+│   │   ├── select.tsx
+│   │   ├── tabs.tsx
+│   │   ├── textarea.tsx
+│   │   ├── toaster.tsx
+│   │   └── tooltip.tsx
+│   └── ProtectedRoute.tsx     # Route guard for authenticated pages
 ├── config/
-│   └── languages.ts     # Language configuration
-├── App.tsx              # Main app with routing
-├── main.tsx             # Entry point
-└── index.css            # Global styles
+│   ├── courses.ts             # Course configuration
+│   └── languages.ts           # Language preferences
+├── hooks/
+│   ├── use-auth.tsx           # Authentication context & provider
+│   ├── use-toast.tsx          # Toast notifications
+│   └── use-language.tsx       # Language preferences
+├── lib/
+│   ├── auth-service.js        # Backend API auth service
+│   ├── auth-utils.js          # Auth utility functions
+│   ├── supabase.ts            # Supabase client (optional)
+│   └── utils.ts               # General utilities
+├── pages/
+│   ├── home.tsx               # Landing page + About page
+│   ├── dashboard.tsx          # User dashboard
+│   ├── login.tsx              # Login page
+│   ├── signup.tsx             # Registration page
+│   ├── forgot-password.tsx    # Password reset request
+│   ├── reset-password.tsx     # Password reset form
+│   ├── profile.tsx            # User profile
+│   ├── settings.tsx           # Account settings
+│   ├── lessons.tsx            # Lesson browser
+│   ├── lesson-detail.tsx     # Single lesson view
+│   ├── quiz.tsx               # Quiz page
+│   ├── challenges.tsx         # Coding challenges
+│   ├── projects.tsx           # Projects hub
+│   ├── community.tsx          # Community forum
+│   ├── leaderboard.tsx       # Leaderboard rankings
+│   ├── resources.tsx          # Resources library
+│   ├── achievements.tsx      # Achievements & badges
+│   ├── flashcards.tsx         # Flashcards
+│   ├── playground.tsx        # Code playground
+│   ├── ai-tutor.tsx          # AI tutor
+│   ├── ai-study-planner.tsx  # AI study planner
+│   ├── learning-hub.tsx      # Learning hub
+│   ├── glossary.tsx          # Glossary list
+│   ├── glossary-term.tsx    # Glossary term detail
+│   ├── subscription.tsx     # Subscription plans
+│   ├── payment-history.tsx  # Payment history
+│   ├── admin-dashboard.tsx  # Admin dashboard
+│   └── not-found.tsx        # 404 page
+├── App.tsx                   # Main app with routing
+├── main.tsx                  # Entry point with providers
+├── index.css                 # Global styles
+└── vite-env.d.ts            # Vite type declarations
 ```
 
-## Testing the Authentication System
+## Pages Overview
 
-### Test Scenarios
+| Route | Page | Description |
+|-------|------|-------------|
+| `/` | Home | Landing page with features, learning paths, and CTA |
+| `/about` | About | About the platform |
+| `/dashboard` | Dashboard | User stats, progress, and recent activity |
+| `/lessons` | Courses | Browse and search courses |
+| `/lessons/:id` | Lesson Detail | View a specific lesson |
+| `/quiz/:lessonId` | Quiz | Take a quiz for a lesson |
+| `/challenges` | Challenges | Browse and solve coding challenges |
+| `/playground` | Playground | Interactive code editor |
+| `/projects` | Projects | Browse and create projects |
+| `/community` | Community | Forum discussions and posts |
+| `/leaderboard` | Leaderboard | User rankings by XP |
+| `/resources` | Resources | Documentation, cheat sheets, tutorials |
+| `/achievements` | Achievements | Badges and achievements |
+| `/flashcards` | Flashcards | Study flashcards |
+| `/ai-tutor` | AI Tutor | AI-powered coding tutor |
+| `/ai-study-planner` | AI Study Planner | Personalised study plans |
+| `/learning-hub` | Learning Hub | Structured learning paths |
+| `/glossary` | Glossary | Programming terms glossary |
+| `/glossary/:slug` | Glossary Term | Single term definition |
+| `/login` | Login | User login (no layout) |
+| `/signup` | Signup | User registration (no layout) |
+| `/forgot-password` | Forgot Password | Request password reset (no layout) |
+| `/reset-password` | Reset Password | Set new password (no layout) |
+| `/profile` | Profile | User profile (protected) |
+| `/settings` | Settings | Account settings (protected) |
+| `/subscription` | Subscription | Premium plans (protected) |
+| `/payment-history` | Payment History | Payment records (protected) |
+| `/admin` | Admin Dashboard | Platform admin (protected, admin only) |
 
-1. **Sign Up Flow**
-   - Register with email/password
-   - Verify email (if using Supabase)
-   - Check profile creation
+## Backend Integration
 
-2. **Login Flow**
-   - Login with registered credentials
-   - Check session persistence
-   - Test logout
+The frontend connects to the Express.js backend at `http://localhost:5000` (configurable via `VITE_API_URL`).
 
-3. **Google Sign-In**
-   - Click "Sign in with Google"
-   - Complete OAuth flow
-   - Verify profile creation
+### Key API Endpoints Used
 
-4. **Password Reset**
-   - Request password reset
-   - Click reset link in email
-   - Set new password
-   - Login with new password
+- `POST /api/auth/signup` - User registration
+- `POST /api/auth/login` - User login
+- `POST /api/auth/logout` - User logout
+- `POST /api/auth/refresh` - Refresh JWT token
+- `POST /api/auth/forgot-password` - Request password reset
+- `GET /api/users/profile` - Get user profile
+- `PUT /api/users/profile` - Update profile
+- `PUT /api/users/password` - Change password
 
-5. **Profile Management**
-   - Update name and bio
-   - Upload profile picture
-   - Change password
-   - Verify changes persist
+### Authentication Flow
 
-### Testing Without Supabase
+1. User signs up/logs in via the frontend forms
+2. Backend returns JWT access token and refresh token
+3. Tokens are stored in localStorage
+4. Auth service attaches `Authorization: Bearer <token>` header to API requests
+5. On 401 response, the auth service attempts to refresh the token
+6. On logout, tokens are cleared from localStorage
 
-The app works fully in localStorage mode for testing:
+## Testing
 
-1. Leave `.env` variables empty
-2. Run `npm run dev`
-3. Test all features - they work without a backend!
+```bash
+npm test           # Run tests
+```
 
 ## Troubleshooting
 
-### Google Sign-In Not Working
+### Cannot Connect to Backend
 
-1. Ensure Supabase credentials are correct in `.env`
-2. Verify Google OAuth is enabled in Supabase dashboard
-3. Check that redirect URIs are correctly configured
-4. Ensure your domain is added to authorized domains
+1. Ensure the backend server is running on port 5000
+2. Check `VITE_API_URL` in `.env`
+3. Verify CORS is configured on the backend
 
-### Email Verification Not Sending
+### Authentication Not Persisting
 
-1. Configure email templates in Supabase (Email Templates)
-2. Ensure your site URL is correct in Supabase settings
-3. Check spam folder for verification emails
-
-### Session Not Persisting
-
-1. Ensure you're not clearing localStorage
-2. Check browser settings (cookies/storage)
-3. Verify Supabase configuration
-
-## Security Considerations
-
-- All passwords are hashed by Supabase (or stored securely in localStorage for dev)
-- JWT tokens are handled by Supabase client
-- Row Level Security (RLS) protects database access
-- CORS is configured for your domain
-- Rate limiting is enabled on auth endpoints
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+1. Check browser localStorage for `infinity-auth-token`
+2. Ensure the backend is running and responding
+3. Verify JWT secret is consistent
 
 ## License
 
-MIT License - see LICENSE file for details
-
-## Support
-
-For issues and questions:
-- GitHub Issues: [Create an issue](https://github.com/Sphile2012/Cpp-EduHub/issues)
-- Documentation: Check the `/docs` folder
+MIT License - see LICENSE file for details.
 
 ---
 
-Built with ❤️ using React, TypeScript, and Supabase
+Built with React, TypeScript, Vite, and Tailwind CSS

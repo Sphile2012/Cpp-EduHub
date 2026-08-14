@@ -128,13 +128,13 @@ function getErrorMessage(error) {
   const message = error.message || String(error);
 
   if (message.includes('Invalid login credentials') || message.includes('Invalid email or password')) {
-    return 'Invalid email or password. Please try again.';
+    return 'Invalid email or password. If you don\'t have an account, please sign up first.';
   }
   if (message.includes('Email not confirmed')) {
     return 'Please verify your email address before logging in.';
   }
   if (message.includes('User already registered') || message.includes('already exists')) {
-    return 'An account with this email already exists.';
+    return 'An account with this email already exists. Please login instead.';
   }
   if (message.includes('Password should be at least') || message.includes('Password must be at least')) {
     return 'Password must be at least 6 characters long.';
@@ -143,13 +143,52 @@ function getErrorMessage(error) {
     return 'Password is too weak. Please use a stronger password.';
   }
   if (message.includes('Invalid email')) {
-    return 'Please enter a valid email address.';
+    return 'Please enter a valid email address. Fake emails are not allowed.';
   }
   if (message.includes('Failed to fetch') || message.includes('NetworkError')) {
     return 'Cannot connect to the server. Please make sure the backend is running.';
   }
+  if (message.includes('User not found') || message.includes('no user')) {
+    return 'No account found with this email. Please sign up first.';
+  }
 
   return message;
+}
+
+/**
+ * Validate email format more strictly to prevent fake emails
+ */
+function isValidEmail(email) {
+  // More strict email regex that checks for valid domain structure
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  if (!emailRegex.test(email)) return false;
+  
+  // Check for valid domain structure
+  const parts = email.split('@');
+  if (parts.length !== 2) return false;
+  
+  const localPart = parts[0];
+  const domainPart = parts[1];
+  
+  // Domain must have at least one dot and valid TLD
+  if (!domainPart || !domainPart.includes('.')) return false;
+  
+  const tld = domainPart.split('.').pop();
+  if (tld.length < 2) return false;
+  
+  // Check for obviously fake/test domains
+  const fakeDomains = ['example.com', 'test.com', 'fake.com', 'temp.com', 'mail.com', 'email.com'];
+  if (fakeDomains.includes(domainPart.toLowerCase())) return false;
+  
+  // Local part should not be too simple
+  if (localPart.length < 2) return false;
+  
+  // Check for common fake patterns
+  if (/^[0-9]+$/.test(localPart)) return false; // Just numbers
+  if (/^test[0-9]*$/.test(localPart.toLowerCase())) return false;
+  if (/^fake[0-9]*$/.test(localPart.toLowerCase())) return false;
+  
+  return true;
 }
 
 /**
@@ -166,9 +205,8 @@ export async function signupUser(payload) {
     return { success: false, error: 'Password must be at least 6 characters.' };
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return { success: false, error: 'Please enter a valid email address.' };
+  if (!isValidEmail(email)) {
+    return { success: false, error: 'Please enter a valid email address. Fake emails are not allowed.' };
   }
 
   const normalizedUsername = sanitizeUsername(username);

@@ -17,6 +17,17 @@ import {
   Crown,
   Shield,
   Bell,
+  Target,
+  FolderGit2,
+  Users,
+  Library,
+  Medal,
+  Settings,
+  GraduationCap,
+  Briefcase,
+  FileText,
+  Sparkles,
+  LayoutDashboard,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
@@ -28,11 +39,17 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { path: '/', label: 'Dashboard', icon: Home },
-  { path: '/lessons', label: 'Courses', icon: BookOpen },
-  { path: '/playground', label: 'Playground', icon: Terminal },
-  { path: '/ai-tutor', label: 'AI Tutor', icon: Brain },
-  { path: '/achievements', label: 'Achievements', icon: Trophy },
+  { path: '/', label: 'Home', icon: Home },
+  { path: '/lessons', label: 'Learn', icon: GraduationCap },
+  { path: '/playground', label: 'Code', icon: Terminal },
+  { path: '/challenges', label: 'Challenges', icon: Target },
+  { path: '/projects', label: 'Projects', icon: FolderGit2 },
+  { path: '/community', label: 'Community', icon: Users },
+  { path: '/resources', label: 'Resources', icon: Library },
+  { path: '/career', label: 'Career', icon: Briefcase },
+  { path: '/portfolio', label: 'Portfolio', icon: FileText },
+  { path: '/ai-tutor', label: 'Infinity AI', icon: Sparkles },
+  { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
 ];
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
@@ -178,6 +195,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                               <Bell className="h-4 w-4" />
                               Payment History
                             </Link>
+                            <Link
+                              href="/settings"
+                              onClick={() => setUserMenuOpen(false)}
+                              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                            >
+                              <Settings className="h-4 w-4" />
+                              Settings
+                            </Link>
                             {user.role === 'admin' && (
                               <Link
                                 href="/admin"
@@ -259,6 +284,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                       <User className="h-5 w-5" />
                       Profile
                     </Link>
+                    <Link
+                      href="/settings"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/50"
+                    >
+                      <Settings className="h-5 w-5" />
+                      Settings
+                    </Link>
                     {user?.role === 'admin' && (
                       <Link
                         href="/admin"
@@ -290,9 +323,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               </div>
               <span className="text-sm text-slate-400">Infinity Code &copy; {new Date().getFullYear()}</span>
             </div>
-            <div className="flex gap-6 text-sm text-slate-400">
+            <div className="flex flex-wrap gap-4 text-sm text-slate-400">
               <Link href="/lessons" className="hover:text-white transition-colors">Courses</Link>
+              <Link href="/challenges" className="hover:text-white transition-colors">Challenges</Link>
               <Link href="/playground" className="hover:text-white transition-colors">Playground</Link>
+              <Link href="/community" className="hover:text-white transition-colors">Community</Link>
+              <Link href="/leaderboard" className="hover:text-white transition-colors">Leaderboard</Link>
+              <Link href="/resources" className="hover:text-white transition-colors">Resources</Link>
               <Link href="/ai-tutor" className="hover:text-white transition-colors">AI Tutor</Link>
             </div>
           </div>

@@ -6,6 +6,7 @@ import { AppLayout } from '@/components/layout/app-layout';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 // Pages
+import HomePage, { AboutPage } from '@/pages/home';
 import Dashboard from '@/pages/dashboard';
 import LessonBrowser from '@/pages/lessons';
 import LessonDetail from '@/pages/lesson-detail';
@@ -26,6 +27,14 @@ import ProfilePage from '@/pages/profile';
 import SubscriptionPage from '@/pages/subscription';
 import PaymentHistoryPage from '@/pages/payment-history';
 import AdminDashboardPage from '@/pages/admin-dashboard';
+import ChallengesPage from '@/pages/challenges';
+import ProjectsPage from '@/pages/projects';
+import CommunityPage from '@/pages/community';
+import ResourcesPage from '@/pages/resources';
+import CareerPage from '@/pages/career';
+import PortfolioPage from '@/pages/portfolio';
+import SettingsPage from '@/pages/settings';
+import LeaderboardPage from '@/pages/leaderboard';
 import NotFound from '@/pages/not-found';
 
 const queryClient = new QueryClient({
@@ -44,7 +53,9 @@ function Router() {
       <Route>
         <AppLayout>
           <Switch>
-            <Route path="/" component={Dashboard} />
+            <Route path="/" component={HomePage} />
+            <Route path="/about" component={AboutPage} />
+            <Route path="/dashboard" component={Dashboard} />
             <Route path="/lessons" component={LessonBrowser} />
             <Route path="/lessons/:id" component={LessonDetail} />
             <Route path="/quiz/:lessonId" component={QuizPage} />
@@ -56,6 +67,13 @@ function Router() {
             <Route path="/learning-hub" component={LearningHubPage} />
             <Route path="/achievements" component={AchievementsPage} />
             <Route path="/flashcards" component={FlashcardsPage} />
+            <Route path="/challenges" component={ChallengesPage} />
+            <Route path="/projects" component={ProjectsPage} />
+            <Route path="/community" component={CommunityPage} />
+            <Route path="/resources" component={ResourcesPage} />
+            <Route path="/career" component={CareerPage} />
+            <Route path="/portfolio" component={PortfolioPage} />
+            <Route path="/leaderboard" component={LeaderboardPage} />
             {/* Protected routes */}
             <Route path="/profile">
               <ProtectedRoute>
@@ -75,6 +93,11 @@ function Router() {
             <Route path="/admin">
               <ProtectedRoute>
                 <AdminDashboardPage />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/settings">
+              <ProtectedRoute>
+                <SettingsPage />
               </ProtectedRoute>
             </Route>
             <Route component={NotFound} />

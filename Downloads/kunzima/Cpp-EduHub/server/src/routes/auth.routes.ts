@@ -1,17 +1,19 @@
 /**
  * Infinity Code - Authentication Routes
  * Handles user registration, login, password reset, and 2FA
+ * Uses in-memory fallback when PostgreSQL is not available
  */
 
 import { Router, Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import { eq, count } from 'drizzle-orm';
 import { z } from 'zod';
-import { db } from '../db/index.js';
+import { db, isDbConnected } from '../db/index.js';
 import { users, userProfiles, userSettings } from '../db/schema/index.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { generateToken, generateRefreshToken, verifyToken } from '../middleware/auth.js';
 import { env } from '../config/env.js';
+import * as memoryStore from '../db/memory-store.js';
 
 const router = Router();
 
@@ -37,6 +39,55 @@ router.post('/signup', async (req: Request, res: Response, next: NextFunction) =
     // Validate request body
     const { email, password, name, username } = signupSchema.parse(req.body);
 
+    // Use in-memory store if database is not connected
+    if (!isDbConnected()) {
+      // Check if user already exists
+      const existingUser = memoryStore.findByEmail(email);
+      if (existingUser) {
+        throw new AppError('An account with this email already exists.', 409);
+      }
+
+      // Check if username is taken
+      const existingUsername = memoryStore.findByUsername(username);
+      if (existingUsername) {
+        throw new AppError('This username is already taken.', 409);
+      }
+
+      // Determine role (first user gets admin role)
+      const role = memoryStore.getUserCount() === 0 || email === env.ADMIN_EMAIL ? 'admin' : 'user';
+
+      // Create user in memory
+      const newUser = await memoryStore.createUser({ email, password, name, username, role });
+
+      // Generate tokens
+      const token = generateToken({
+        id: newUser.id,
+        email: newUser.email,
+        role: newUser.role,
+      });
+
+      const refreshToken = generateRefreshToken({
+        id: newUser.id,
+        email: newUser.email,
+        role: newUser.role,
+      });
+
+      return res.status(201).json({
+        message: 'Account created successfully',
+        user: {
+          id: newUser.id,
+          email: newUser.email,
+          name: newUser.name,
+          username: newUser.username,
+          role: newUser.role,
+          avatar: newUser.avatar,
+        },
+        token,
+        refreshToken,
+      });
+    }
+
+    // Database path
     // Check if user already exists
     const existingUser = await db.query.users.findFirst({
       where: eq(users.email, email),
@@ -125,6 +176,51 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
     // Validate request body
     const { email, password } = loginSchema.parse(req.body);
 
+    // Use in-memory store if database is not connected
+    if (!isDbConnected()) {
+      const user = memoryStore.findByEmail(email);
+
+      if (!user || !user.passwordHash) {
+        throw new AppError('Invalid email or password.', 401);
+      }
+
+      const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+      if (!isValidPassword) {
+        throw new AppError('Invalid email or password.', 401);
+      }
+
+      // Update last login
+      memoryStore.updateLastLogin(user.id);
+
+      // Generate tokens
+      const token = generateToken({
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      });
+
+      const refreshToken = generateRefreshToken({
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      });
+
+      return res.json({
+        message: 'Login successful',
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          username: user.username,
+          role: user.role,
+          avatar: user.avatar,
+        },
+        token,
+        refreshToken,
+      });
+    }
+
+    // Database path
     // Find user
     const user = await db.query.users.findFirst({
       where: eq(users.email, email),
@@ -195,6 +291,32 @@ router.post('/refresh', async (req: Request, res: Response, next: NextFunction) 
     // Verify refresh token
     const decoded = verifyToken(refreshToken);
 
+    // Use in-memory store if database is not connected
+    if (!isDbConnected()) {
+      const user = memoryStore.findById(decoded.id);
+      if (!user) {
+        throw new AppError('User not found.', 404);
+      }
+
+      const newToken = generateToken({
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      });
+
+      const newRefreshToken = generateRefreshToken({
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      });
+
+      return res.json({
+        token: newToken,
+        refreshToken: newRefreshToken,
+      });
+    }
+
+    // Database path
     // Find user
     const user = await db.query.users.findFirst({
       where: eq(users.id, decoded.id),
@@ -241,20 +363,25 @@ router.post('/forgot-password', async (req: Request, res: Response, next: NextFu
       throw new AppError('Email is required.', 400);
     }
 
-    // Check if user exists
-    const user = await db.query.users.findFirst({
-      where: eq(users.email, email),
-    });
-
     // Always return success to prevent email enumeration
     res.json({
       message: 'If an account exists with this email, you will receive a password reset link.',
     });
 
-    if (user) {
-      // TODO: Send password reset email with reset token
-      // For now, we'll just log it
-      console.log('Password reset requested for:', email);
+    // Check if user exists (in memory or database)
+    if (!isDbConnected()) {
+      const user = memoryStore.findByEmail(email);
+      if (user) {
+        console.log('Password reset requested for:', email);
+      }
+    } else {
+      const user = await db.query.users.findFirst({
+        where: eq(users.email, email),
+      });
+      if (user) {
+        // TODO: Send password reset email with reset token
+        console.log('Password reset requested for:', email);
+      }
     }
   } catch (error) {
     next(error);

@@ -1,0 +1,29 @@
+{
+  "name": "cpp-eduhub",
+  "version": "1.0.0",
+  "description": "Cpp-EduHub - A C++ learning platform with interactive courses, quizzes, and community features",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install && npm --prefix server install && npm --prefix artifacts/cpp-learn install",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix artifacts/cpp-learn run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build:server": "npm --prefix server run build",
+    "build:client": "cd artifacts/cpp-learn && npm install && npm run build",
+    "build": "npm run build:server && npm run build:client",
+    "start:server": "npm --prefix server start",
+    "start:client": "npm --prefix artifacts/cpp-learn run preview",
+    "start": "concurrently \"npm run start:server\" \"npm run start:client\"",
+    "seed": "npm --prefix server run seed"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.8",
+    "@react-three/fiber": "^9.7.0",
+    "clsx": "^2.1.1",
+    "three": "^0.185.1"
+  }
+}

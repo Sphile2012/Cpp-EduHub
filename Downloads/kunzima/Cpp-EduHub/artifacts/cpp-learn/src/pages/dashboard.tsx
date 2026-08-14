@@ -1,65 +1,178 @@
+/**
+ * Infinity Code - Developer Dashboard
+ * Personalised dashboard with coding activity, progress, and recent activity
+ */
+
 import { Link } from 'wouter';
-import { motion } from 'framer-motion';
-import { BookOpen, Code, Brain, Trophy, Flame, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-
-const featuredCourses = [
-  { id: 1, title: 'C++ Fundamentals', level: 'Beginner', lessons: 24, icon: '📘', color: 'from-blue-500 to-blue-700' },
-  { id: 2, title: 'Data Structures', level: 'Intermediate', lessons: 32, icon: '🗂️', color: 'from-purple-500 to-purple-700' },
-  { id: 3, title: 'Web Development', level: 'Beginner', lessons: 18, icon: '🌐', color: 'from-green-500 to-green-700' },
-  { id: 4, title: 'Python Basics', level: 'Beginner', lessons: 20, icon: '🐍', color: 'from-yellow-500 to-yellow-700' },
-];
-
-const stats = [
-  { label: 'Lessons Completed', value: 0, icon: BookOpen, color: 'text-blue-400' },
-  { label: 'Code Exercises', value: 0, icon: Code, color: 'text-green-400' },
-  { label: 'Quizzes Passed', value: 0, icon: Brain, color: 'text-purple-400' },
-  { label: 'Day Streak', value: 0, icon: Flame, color: 'text-orange-400' },
-];
+import { useState } from 'react';
 
 export default function Dashboard() {
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
+  const [streak] = useState(7);
+  const [xp] = useState(2450);
+  const [level] = useState(3);
+
+  const stats = [
+    { label: 'Lessons Completed', value: 24, icon: '📚', color: 'from-blue-500 to-cyan-500' },
+    { label: 'Challenges Solved', value: 18, icon: '🎯', color: 'from-green-500 to-emerald-500' },
+    { label: 'Projects Created', value: 3, icon: '🚀', color: 'from-purple-500 to-pink-500' },
+    { label: 'Coding Sessions', value: 45, icon: '💻', color: 'from-orange-500 to-red-500' },
+  ];
+
+  const recentActivity = [
+    { type: 'lesson', title: 'Completed: JavaScript Fundamentals', time: '2 hours ago', icon: '✅' },
+    { type: 'challenge', title: 'Solved: Two Sum (Easy)', time: '5 hours ago', icon: '🎯' },
+    { type: 'achievement', title: 'Unlocked: Code Streak 🔥', time: '1 day ago', icon: '🏆' },
+    { type: 'project', title: 'Updated: Portfolio Website', time: '2 days ago', icon: '🚀' },
+    { type: 'lesson', title: 'Completed: React Hooks', time: '3 days ago', icon: '✅' },
+  ];
+
+  const learningPaths = [
+    { title: 'Web Development', progress: 65, lessons: 8, total: 12, color: 'from-blue-500 to-cyan-500' },
+    { title: 'JavaScript Basics', progress: 100, lessons: 10, total: 10, color: 'from-green-500 to-emerald-500' },
+    { title: 'Backend Development', progress: 25, lessons: 3, total: 12, color: 'from-purple-500 to-pink-500' },
+  ];
+
+  const levelName = ['Beginner', 'Explorer', 'Developer', 'Builder', 'Engineer', 'Expert'];
+  const xpForNextLevel = (level + 1) * 1000;
+  const xpProgress = (xp / xpForNextLevel) * 100;
+
   return (
-    <div className="space-y-8">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 p-8 text-white">
-        <h1 className="text-3xl font-bold mb-2">{isAuthenticated ? `Welcome back, ${user?.name?.split(' ')[0] || 'Learner'}!` : 'Welcome to Infinity Code'}</h1>
-        <p className="text-blue-100 mb-6">{isAuthenticated ? 'Continue your learning journey.' : 'Your all-in-one platform to learn programming.'}</p>
-        <div className="flex flex-wrap gap-3">
-          <Link href="/lessons"><button className="rounded-lg bg-white text-blue-600 px-6 py-2.5 font-medium hover:bg-blue-50 transition-colors">Browse Courses</button></Link>
-          <Link href="/playground"><button className="rounded-lg bg-blue-500/30 text-white border border-white/20 px-6 py-2.5 font-medium hover:bg-blue-500/40 transition-colors">Open Playground</button></Link>
+    <div className="min-h-screen bg-[#0a0a0f] pt-20 pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Welcome Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">
+            Welcome back, {user?.name || 'Developer'} 👋
+          </h1>
+          <p className="text-gray-400">Ready to continue your coding journey?</p>
         </div>
-      </motion.div>
-      {isAuthenticated && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat, i) => (
-            <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-              <Card><CardContent className="p-6">
-                <div className="flex items-center justify-between mb-2"><stat.icon className={`h-8 w-8 ${stat.color}`} /><span className="text-2xl font-bold">{stat.value}</span></div>
-                <p className="text-sm text-slate-400">{stat.label}</p>
-              </CardContent></Card>
-            </motion.div>
+
+        {/* Level & XP Bar */}
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#00d4ff] to-[#7c3aed] flex items-center justify-center text-white font-bold text-lg">
+                {level}
+              </div>
+              <div>
+                <div className="text-white font-semibold">Level {level} — {levelName[level - 1]}</div>
+                <div className="text-sm text-gray-400">{xp.toLocaleString()} XP</div>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-gray-400">Next: {levelName[level]}</div>
+              <div className="text-sm text-[#00d4ff]">{xpForNextLevel - xp} XP to go</div>
+            </div>
+          </div>
+          <div className="w-full h-3 bg-white/5 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-[#00d4ff] to-[#7c3aed] rounded-full transition-all duration-500"
+              style={{ width: `${xpProgress}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Streak Banner */}
+        <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/20 rounded-2xl p-6 mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <span className="text-4xl">🔥</span>
+            <div>
+              <div className="text-2xl font-bold text-white">{streak} Day Coding Streak</div>
+              <div className="text-sm text-gray-400">Keep it up! Code today to maintain your streak.</div>
+            </div>
+          </div>
+          <Link
+            to="/playground"
+            className="px-4 py-2 bg-orange-500/20 border border-orange-500/30 text-orange-400 rounded-lg text-sm font-medium hover:bg-orange-500/30 transition"
+          >
+            Code Now →
+          </Link>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {stats.map((stat) => (
+            <div key={stat.label} className="bg-white/5 border border-white/10 rounded-2xl p-6">
+              <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center text-xl mb-3`}>
+                {stat.icon}
+              </div>
+              <div className="text-2xl font-bold text-white">{stat.value}</div>
+              <div className="text-sm text-gray-400">{stat.label}</div>
+            </div>
           ))}
         </div>
-      )}
-      <div>
-        <div className="flex items-center justify-between mb-4"><h2 className="text-xl font-bold">Featured Courses</h2><Link href="/lessons" className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1">View all <ArrowRight className="h-4 w-4" /></Link></div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {featuredCourses.map((course, i) => (
-            <motion.div key={course.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-              <Link href={`/lessons/${course.id}`}><Card className="overflow-hidden hover:border-blue-500/50 transition-colors cursor-pointer h-full">
-                <div className={`h-32 bg-gradient-to-br ${course.color} flex items-center justify-center text-5xl`}>{course.icon}</div>
-                <CardContent className="p-4"><div className="flex items-center justify-between mb-2"><Badge variant="secondary">{course.level}</Badge><span className="text-xs text-slate-400">{course.lessons} lessons</span></div><h3 className="font-semibold mb-1">{course.title}</h3></CardContent>
-              </Card></Link>
-            </motion.div>
-          ))}
+
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Continue Learning */}
+          <div>
+            <h2 className="text-xl font-bold text-white mb-4">Continue Learning</h2>
+            <div className="space-y-4">
+              {learningPaths.map((path) => (
+                <div key={path.title} className="bg-white/5 border border-white/10 rounded-2xl p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-semibold text-white">{path.title}</h3>
+                    <span className="text-sm text-gray-400">{path.lessons}/{path.total} lessons</span>
+                  </div>
+                  <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden mb-3">
+                    <div
+                      className={`h-full bg-gradient-to-r ${path.color} rounded-full`}
+                      style={{ width: `${path.progress}%` }}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-400">{path.progress}% complete</span>
+                    <Link
+                      to="/learning-hub"
+                      className="text-sm text-[#00d4ff] hover:underline"
+                    >
+                      {path.progress === 100 ? 'Review →' : 'Continue →'}
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Recent Activity */}
+          <div>
+            <h2 className="text-xl font-bold text-white mb-4">Recent Activity</h2>
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+              <div className="space-y-4">
+                {recentActivity.map((activity, i) => (
+                  <div key={i} className="flex items-start gap-3 pb-4 border-b border-white/5 last:border-0 last:pb-0">
+                    <span className="text-xl">{activity.icon}</span>
+                    <div className="flex-1">
+                      <p className="text-sm text-white">{activity.title}</p>
+                      <p className="text-xs text-gray-500">{activity.time}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Link href="/ai-tutor"><Card className="hover:border-blue-500/50 transition-colors cursor-pointer"><CardContent className="p-6 flex items-center gap-4"><div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/20"><Brain className="h-6 w-6 text-purple-400" /></div><div><h3 className="font-semibold">AI Assistant</h3><p className="text-sm text-slate-400">Get help with code</p></div></CardContent></Card></Link>
-        <Link href="/playground"><Card className="hover:border-blue-500/50 transition-colors cursor-pointer"><CardContent className="p-6 flex items-center gap-4"><div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-500/20"><Code className="h-6 w-6 text-green-400" /></div><div><h3 className="font-semibold">Code Playground</h3><p className="text-sm text-slate-400">Practice coding</p></div></CardContent></Card></Link>
-        <Link href="/achievements"><Card className="hover:border-blue-500/50 transition-colors cursor-pointer"><CardContent className="p-6 flex items-center gap-4"><div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500/20"><Trophy className="h-6 w-6 text-orange-400" /></div><div><h3 className="font-semibold">Achievements</h3><p className="text-sm text-slate-400">Track your progress</p></div></CardContent></Card></Link>
+
+        {/* Quick Actions */}
+        <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <Link to="/playground" className="bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 transition group">
+            <div className="text-2xl mb-2">💻</div>
+            <div className="text-sm font-medium text-white group-hover:text-[#00d4ff] transition">Code Studio</div>
+          </Link>
+          <Link to="/quiz" className="bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 transition group">
+            <div className="text-2xl mb-2">🎯</div>
+            <div className="text-sm font-medium text-white group-hover:text-[#00d4ff] transition">Challenges</div>
+          </Link>
+          <Link to="/achievements" className="bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 transition group">
+            <div className="text-2xl mb-2">🏆</div>
+            <div className="text-sm font-medium text-white group-hover:text-[#00d4ff] transition">Achievements</div>
+          </Link>
+          <Link to="/learning-hub" className="bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 transition group">
+            <div className="text-2xl mb-2">📚</div>
+            <div className="text-sm font-medium text-white group-hover:text-[#00d4ff] transition">Learn</div>
+          </Link>
+        </div>
       </div>
     </div>
   );

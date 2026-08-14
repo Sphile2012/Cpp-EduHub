@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { isSupabaseConfigured, getSupabaseClient } from '@/lib/supabase';
 
-const PREMIUM_PRICE = 29.99;
+const PREMIUM_PRICE = 49.99;
 const CURRENCY = 'ZAR';
 
 const premiumFeatures = [

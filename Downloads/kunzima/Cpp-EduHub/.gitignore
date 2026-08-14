@@ -33,9 +33,3 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
-
-# Stray files
-c
-button.tsx
-art
-[object Object]/

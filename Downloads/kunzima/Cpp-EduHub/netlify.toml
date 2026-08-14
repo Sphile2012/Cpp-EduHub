@@ -1,0 +1,37 @@
+# Netlify Deployment Configuration for Infinity Code
+# https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  base = "/"
+  publish = "artifacts/cpp-learn/dist"
+  command = "npm run install:all && npm run build:client"
+
+# Redirect all requests to index.html for SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Cache static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Environment variables (set these in Netlify UI or CLI)
+# SUPABASE_URL=your_supabase_url
+# SUPABASE_ANON_KEY=your_supabase_anon_key
+
+[dev]
+  command = "npm run dev:client"
+  port = 5173
+  targetPort = 5173
+  autoLaunch = true

@@ -33,3 +33,10 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# Personal directories (exclude Team 7 and personal OneDrive files)
+**/OneDrive/
+**/team 7/
+**/Team 7/
+FraudGuardStream/
+phume-dev-folio/

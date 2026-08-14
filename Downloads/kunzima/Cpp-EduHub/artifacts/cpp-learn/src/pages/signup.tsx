@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Mail, Lock, User, Loader2, Chrome, CheckCircle, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 export default function SignupPage() {
-  const { signup, loginWithGoogle } = useAuth();
+  const { signup } = useAuth();
   const [, navigate] = useLocation();
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
@@ -71,19 +71,6 @@ export default function SignupPage() {
     } else {
       setError(result.error || 'Signup failed');
     }
-    setIsLoading(false);
-  };
-
-  const handleGoogleSignup = async () => {
-    setIsLoading(true);
-    setError(null);
-    const result = await loginWithGoogle();
-    if (result.success && !result.redirecting) {
-      navigate('/dashboard');
-    } else if (!result.redirecting) {
-      setError(result.error || 'Google Sign-Up failed');
-    }
-    // If redirecting, the page will navigate automatically
     setIsLoading(false);
   };
 
@@ -228,30 +215,6 @@ export default function SignupPage() {
                 )}
               </Button>
             </form>
-
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-700"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="bg-slate-900 px-2 text-slate-400">Or continue with</span>
-              </div>
-            </div>
-
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleGoogleSignup}
-              disabled={isLoading}
-              className="w-full h-12 border-slate-700 text-white hover:bg-slate-800 hover:text-white font-medium"
-            >
-              {isLoading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Chrome className="mr-2 h-5 w-5" />
-              )}
-              Sign up with Google
-            </Button>
           </>
         ) : (
           <div className="text-center">

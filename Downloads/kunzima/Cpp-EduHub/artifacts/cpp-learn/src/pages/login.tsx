@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Mail, Lock, Loader2, Chrome } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 export default function LoginPage() {
-  const { login, loginWithGoogle } = useAuth();
+  const { login } = useAuth();
   const [, navigate] = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -26,19 +26,6 @@ export default function LoginPage() {
     } else {
       setError(result.error || 'Login failed');
     }
-    setIsLoading(false);
-  };
-
-  const handleGoogleLogin = async () => {
-    setIsLoading(true);
-    setError(null);
-    const result = await loginWithGoogle();
-    if (result.success && !result.redirecting) {
-      navigate('/dashboard');
-    } else if (!result.redirecting) {
-      setError(result.error || 'Google Sign-In failed');
-    }
-    // If redirecting, the page will navigate automatically
     setIsLoading(false);
   };
 
@@ -128,30 +115,6 @@ export default function LoginPage() {
             )}
           </Button>
         </form>
-
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-700"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="bg-slate-900 px-2 text-slate-400">Or continue with</span>
-          </div>
-        </div>
-
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleGoogleLogin}
-          disabled={isLoading}
-          className="w-full h-12 border-slate-700 text-white hover:bg-slate-800 hover:text-white font-medium"
-        >
-          {isLoading ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Chrome className="mr-2 h-5 w-5" />
-          )}
-          Sign in with Google
-        </Button>
 
         <p className="mt-6 text-center text-sm text-slate-400">
           Don't have an account?{' '}
